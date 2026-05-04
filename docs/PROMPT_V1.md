@@ -172,3 +172,47 @@ Examples:
 ## Output
 
 Return the full updated app/bot.py file only.
+
+---
+
+# PROMPT V1 - TASK 4: Monthly Tracking
+
+## Context
+
+We store transactions per user in memory.
+Each transaction includes a created_at timestamp.
+
+---
+
+## Task
+
+Update the "מצב" command to return only transactions from the current month.
+
+---
+
+## Scope
+
+Modify only:
+- app/bot.py
+
+---
+
+## Constraints
+
+- Do NOT modify storage structure
+- Do NOT modify calculations
+- Do NOT change how transactions are saved
+- Use existing created_at field
+
+---
+
+## Expected Behavior
+
+If user has transactions across months:
+"מצב" should show only current month totals.
+
+---
+
+## Output
+
+Return updated parts of app/bot.py only.
