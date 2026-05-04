@@ -54,3 +54,62 @@ After:
 ## Output
 
 Return the full updated app/bot.py file only.
+
+---
+
+# PROMPT V1 - TASK 2: Robust Input Parsing
+
+## Context
+
+We have a working Telegram bot in app/bot.py.
+
+Current behavior:
+- Supports numeric input like "11700"
+- Supports comma-separated numbers like "11,700"
+- Supports VAT-excluded input using "נוכה"
+
+---
+
+## Task
+
+Improve input parsing to support real-world user inputs.
+
+The bot must correctly handle:
+
+- " 11,700 "
+- "11 700"
+- "₪11,700"
+- "11700₪"
+- "11,700 נוכה"
+- combinations of the above
+
+---
+
+## Scope
+
+Modify only:
+- app/bot.py
+
+---
+
+## Constraints
+
+- Do NOT modify app/calculations.py
+- Do NOT change calculation logic
+- Do NOT change response format
+- Do NOT remove support for "נוכה"
+- Do NOT add new dependencies
+- Keep changes minimal and focused
+
+---
+
+## Expected Behavior
+
+All valid numeric inputs with spaces, commas or currency symbols
+must be correctly parsed into a float.
+
+---
+
+## Output
+
+Return the full updated app/bot.py file only.

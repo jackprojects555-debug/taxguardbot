@@ -20,6 +20,7 @@
 - Action-oriented UX response
 - Support for comma-separated input (e.g., "11,700", "11,700 נוכה")
 - Remove debug print from bot parsing
+- Robust input parsing (spaces, currency symbol, flexible formats)
 
 ### Technical
 
