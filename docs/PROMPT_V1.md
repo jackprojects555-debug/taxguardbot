@@ -113,3 +113,62 @@ must be correctly parsed into a float.
 ## Output
 
 Return the full updated app/bot.py file only.
+
+---
+
+# PROMPT V1 - TASK 3: Input Validation & Error Handling
+
+## Context
+
+We have a Telegram bot that parses numeric income input.
+
+Current behavior:
+- Accepts numbers and formatted numbers
+- Returns a generic error message on invalid input
+
+---
+
+## Task
+
+Improve validation and error handling.
+
+The bot must:
+
+1. Reject non-numeric input with clear message
+2. Reject negative values
+3. Accept decimal values (e.g. "11700.50")
+4. Reject shorthand formats (e.g. "11k")
+5. Provide specific error messages
+
+---
+
+## Scope
+
+Modify only:
+- app/bot.py
+
+---
+
+## Constraints
+
+- Do NOT modify app/calculations.py
+- Do NOT change calculation logic
+- Do NOT change valid input behavior
+- Do NOT add new dependencies
+
+---
+
+## Expected Behavior
+
+Examples:
+
+"abc" → "Invalid input. Please enter a number."
+"-500" → "Amount must be positive."
+"11k" → "Unsupported format. Please enter full number."
+"11700.50" → accepted
+
+---
+
+## Output
+
+Return the full updated app/bot.py file only.

@@ -21,6 +21,7 @@
 - Support for comma-separated input (e.g., "11,700", "11,700 נוכה")
 - Remove debug print from bot parsing
 - Robust input parsing (spaces, currency symbol, flexible formats)
+- Input validation and improved error handling (negative, zero, invalid formats)
 
 ### Technical
 
