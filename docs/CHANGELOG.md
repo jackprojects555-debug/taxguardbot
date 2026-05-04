@@ -30,4 +30,4 @@
 - Git repository initialized
 - GitHub repository connected
 - Requirements file create
-
+- Add test strategy document for consistent validation
