@@ -46,7 +46,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = text.replace("נוכה", "").strip()
 
         text = text.replace(",", "")
+        text = text.replace(" ", "")
+        text = text.replace("₪", "")
+
+        if not text:
+            response = "Invalid input. Please enter a number."
+            await update.message.reply_text(response)
+            return
+
+        if text.lower().endswith("k") and text[:-1]:
+            numeric_part = text[:-1].replace(".", "", 1)
+            if numeric_part.isdigit():
+                response = "Unsupported format. Please enter full number."
+                await update.message.reply_text(response)
+                return
+
         amount = float(text)
+
+        if amount <= 0:
+            response = "Amount must be positive."
+            await update.message.reply_text(response)
+            return
 
         result = calculate_income_split(
             amount=amount,
@@ -81,7 +101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except ValueError:
-        response = "שלח סכום מספרי בלבד, לדוגמה: 11700 או 11700 נוכה"
+        response = "Invalid input. Please enter a number."
 
     await update.message.reply_text(response)
 
