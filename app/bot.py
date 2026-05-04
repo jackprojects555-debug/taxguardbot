@@ -45,6 +45,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             vat_included = False
             text = text.replace("נוכה", "").strip()
 
+        text = text.replace(",", "")
+        print(repr(text))
         amount = float(text)
 
         result = calculate_income_split(

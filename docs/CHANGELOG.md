@@ -18,10 +18,11 @@
 - In-memory storage per user
 - "מצב" command for summary
 - Action-oriented UX response
+- Support for comma-separated input (e.g., "11,700", "11,700 נוכה")
 
 ### Technical
 
 - Project structure initialized
 - Git repository initialized
 - GitHub repository connected
-- Requirements file created
+- Requirements file create
