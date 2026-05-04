@@ -19,6 +19,7 @@
 - "מצב" command for summary
 - Action-oriented UX response
 - Support for comma-separated input (e.g., "11,700", "11,700 נוכה")
+- Remove debug print from bot parsing
 
 ### Technical
 
@@ -26,3 +27,4 @@
 - Git repository initialized
 - GitHub repository connected
 - Requirements file create
+
