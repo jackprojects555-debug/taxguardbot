@@ -22,6 +22,7 @@
 - Remove debug print from bot parsing
 - Robust input parsing (spaces, currency symbol, flexible formats)
 - Input validation and improved error handling (negative, zero, invalid formats)
+- Monthly tracking: "מצב" now reflects current month only
 
 ### Technical
 

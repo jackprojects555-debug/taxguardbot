@@ -20,6 +20,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text == "מצב":
         transactions = get_transactions(user_id)
+        now = datetime.now()
+        transactions = [
+            t
+            for t in transactions
+            if t.created_at.year == now.year and t.created_at.month == now.month
+        ]
 
         if not transactions:
             response = "אין עדיין נתונים החודש."
