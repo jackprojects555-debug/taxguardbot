@@ -56,3 +56,10 @@ MVP working:
 - Persistent storage (DB)
 - UX improvements
 - Admin dashboard
+
+## Cursor Usage
+
+This project follows strict Cursor usage rules.
+
+See:
+docs/CURSOR_WORKING_METHOD_V2.md
