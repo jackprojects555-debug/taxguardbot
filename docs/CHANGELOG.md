@@ -1,6 +1,15 @@
 # CHANGELOG
 
-## v1.0 - Initial MVP
+## v1.1 - 2026-05-05
+
+### Added
+
+- Reset command with multiple variations (reset, Reset, אפס, נקה, מחק)
+- Test strategy document for consistent validation
+
+---
+
+## v1.0 - 2026-05-05
 
 ### Added
 
@@ -18,16 +27,21 @@
 - In-memory storage per user
 - "מצב" command for summary
 - Action-oriented UX response
+
+### Improvements
+
 - Support for comma-separated input (e.g., "11,700", "11,700 נוכה")
-- Remove debug print from bot parsing
 - Robust input parsing (spaces, currency symbol, flexible formats)
 - Input validation and improved error handling (negative, zero, invalid formats)
 - Monthly tracking: "מצב" now reflects current month only
+
+### Fixes
+
+- Remove debug print from bot parsing
 
 ### Technical
 
 - Project structure initialized
 - Git repository initialized
 - GitHub repository connected
-- Requirements file create
-- Add test strategy document for consistent validation
+- Requirements file created

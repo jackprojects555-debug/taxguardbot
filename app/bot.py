@@ -7,7 +7,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filte
 
 from app.calculations import calculate_income_split
 from app.models import Transaction
-from app.storage import add_transaction, get_transactions
+from app.storage import add_transaction, clear_transactions, get_transactions
 
 load_dotenv()
 
@@ -17,6 +17,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
     user_id = update.effective_user.id
+
+    if text.lower() == "reset" or text in ("אפס", "נקה", "מחק"):
+        clear_transactions(user_id)
+        await update.message.reply_text("All data has been reset.")
+        return
 
     if text == "מצב":
         transactions = get_transactions(user_id)

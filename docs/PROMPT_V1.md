@@ -216,3 +216,109 @@ If user has transactions across months:
 ## Output
 
 Return updated parts of app/bot.py only.
+
+---
+
+# PROMPT V1.1 - TASK 1: Reset Command
+
+## Context
+
+We store transactions per user in memory.
+
+Users currently cannot reset or clear their data.
+
+---
+
+## Task
+
+Add a new command:
+
+"reset"
+
+When user sends "reset":
+- all their stored transactions must be deleted
+
+---
+
+## Scope
+
+Modify only:
+- app/bot.py
+- app/storage.py
+
+---
+
+## Constraints
+
+- Do NOT modify calculations
+- Do NOT change transaction structure
+- Do NOT affect other users' data
+
+---
+
+## Expected Behavior
+
+User sends:
+"reset"
+
+System:
+- clears their data
+- responds: "All data has been reset."
+
+---
+
+## Output
+
+Return updated parts of files only.
+
+---
+
+# PROMPT V1.1 - TASK 2: Reset Command Variations
+
+## Context
+
+We already support "reset" command to clear user data.
+
+---
+
+## Task
+
+Extend reset command to support multiple variations:
+
+- "reset"
+- "Reset"
+- "אפס"
+- "נקה"
+- "מחק"
+
+All must trigger the same behavior.
+
+---
+
+## Scope
+
+Modify only:
+- app/bot.py
+
+---
+
+## Constraints
+
+- Do NOT modify storage
+- Do NOT change reset logic
+- Only extend input matching
+- Keep implementation simple
+
+---
+
+## Expected Behavior
+
+Any of the above inputs:
+→ clears data
+→ returns: "All data has been reset."
+
+---
+
+## Output
+
+Return updated parts of app/bot.py only.

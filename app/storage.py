@@ -15,3 +15,7 @@ def add_transaction(user_id: int, transaction: Transaction):
 
 def get_transactions(user_id: int) -> List[Transaction]:
     return USER_TRANSACTIONS.get(user_id, [])
+
+
+def clear_transactions(user_id: int):
+    USER_TRANSACTIONS.pop(user_id, None)
