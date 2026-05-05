@@ -41,7 +41,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             response = (
                 f"סיכום עד כה:\n\n"
-                f"הכנסות: ₪{total_income:,.0f}\n"
+                f"הכנסות: ₪{total_income:,.0f}\n\n"
                 f"לשמירה: ₪{total_to_save:,.0f}\n"
                 f"פנוי: ₪{total_available:,.0f}"
             )
@@ -101,7 +101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         response = (
             f"נכנסו ₪{result['amount']:,.0f}\n\n"
-            f"להפרשה:\n"
+            f"להפרשה:\n\n"
             f"מע״מ: ₪{result['vat_amount']:,.0f}\n"
             f"מס הכנסה: ₪{result['income_tax_amount']:,.0f}\n"
             f"ביטוח לאומי: ₪{result['national_insurance_amount']:,.0f}\n"

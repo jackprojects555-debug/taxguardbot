@@ -322,3 +322,50 @@ Any of the above inputs:
 ## Output
 
 Return updated parts of app/bot.py only.
+
+---
+
+# PROMPT V1.1 - TASK 3: UX Improvement (STRICT)
+
+## Context
+
+We have a working Telegram bot in app/bot.py.
+Messages must remain EXACTLY the same in wording.
+
+---
+
+## Task
+
+Improve visual formatting ONLY.
+
+---
+
+## Scope
+
+Modify only:
+- response strings inside handle_message
+
+---
+
+## Constraints (CRITICAL)
+
+- Do NOT change ANY existing words
+- Do NOT rename ANY labels
+- Do NOT translate or rephrase anything
+- Do NOT remove any lines
+- Do NOT add new sentences
+- Only add spacing (newlines) if needed
+
+---
+
+## Required Changes
+
+1. Improve spacing between sections
+2. Add consistent blank lines where helpful
+3. Keep original text EXACTLY as is
+
+---
+
+## Output
+
+Return updated handle_message function only.

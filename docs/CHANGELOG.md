@@ -6,6 +6,7 @@
 
 - Reset command with multiple variations (reset, Reset, אפס, נקה, מחק)
 - Test strategy document for consistent validation
+- Improve message formatting (spacing and readability, no wording changes)
 
 ---
 
