@@ -36,12 +36,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response = "אין עדיין נתונים החודש."
         else:
             total_income = sum(t.amount for t in transactions)
+            total_vat = sum(t.vat_amount for t in transactions)
+            total_income_tax = sum(t.income_tax_amount for t in transactions)
+            total_national_insurance = sum(t.national_insurance_amount for t in transactions)
+            total_social_savings = sum(t.social_savings_amount for t in transactions)
             total_to_save = sum(t.total_to_save for t in transactions)
             total_available = sum(t.available_amount for t in transactions)
 
             response = (
                 f"סיכום עד כה:\n\n"
                 f"הכנסות: ₪{total_income:,.0f}\n\n"
+                f"מע״מ: ₪{total_vat:,.0f}\n"
+                f"מס הכנסה: ₪{total_income_tax:,.0f}\n"
+                f"ביטוח לאומי: ₪{total_national_insurance:,.0f}\n"
+                f"סוציאליות: ₪{total_social_savings:,.0f}\n\n"
                 f"לשמירה: ₪{total_to_save:,.0f}\n"
                 f"פנוי: ₪{total_available:,.0f}"
             )

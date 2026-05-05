@@ -7,6 +7,8 @@
 - Reset command with multiple variations (reset, Reset, אפס, נקה, מחק)
 - Test strategy document for consistent validation
 - Improve message formatting (spacing and readability, no wording changes)
+- Add detailed monthly breakdown in summary (VAT, income tax, national insurance, social savings)
+- Add JSON-based persistence (data stored in file and survives restarts)
 
 ---
 

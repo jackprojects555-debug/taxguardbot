@@ -369,3 +369,181 @@ Modify only:
 ## Output
 
 Return updated handle_message function only.
+
+---
+
+# PROMPT V1.1 - TASK 4: Better Summary (STRICT)
+
+## Context
+
+We have a "מצב" command that returns summary totals.
+
+---
+
+## Task
+
+Extend the summary to include additional aggregated fields.
+
+---
+
+## Scope
+
+Modify only:
+- summary response inside handle_message in app/bot.py
+
+---
+
+## Constraints
+
+- Do NOT change existing wording
+- Do NOT rename existing labels
+- Do NOT remove existing lines
+- Do NOT change order of existing fields
+- Only ADD new lines for additional totals
+
+---
+
+## Required Additions
+
+Add totals for:
+
+- VAT (מע״מ)
+- Income tax (מס הכנסה)
+- National insurance (ביטוח לאומי)
+- Social savings (סוציאליות)
+
+Each must be summed from transactions.
+
+---
+
+## Placement
+
+Insert new totals in the "מצב" response,
+between existing breakdown and totals sections.
+
+---
+
+## Output
+
+Return updated handle_message function only.
+
+---
+
+# PROMPT V1.1 - TASK 5: Basic Persistence (STRICT)
+
+## Context
+
+Transactions are currently stored in memory in USER_TRANSACTIONS.
+
+---
+
+## Task
+
+Add simple JSON file persistence.
+
+---
+
+## Scope
+
+Modify only:
+- app/storage.py
+
+---
+
+## Constraints (CRITICAL)
+
+- Do NOT change existing function names
+- Do NOT change transaction structure
+- Do NOT modify bot logic
+- Do NOT add external dependencies
+- Keep storage API identical
+
+---
+
+## File Requirements
+
+- Use a single JSON file:
+  data/transactions.json
+
+- Structure:
+
+{
+  "user_id": [
+    {transaction},
+    ...
+  ]
+}
+
+---
+
+## Required Behavior
+
+1. On add_transaction:
+   - update memory
+   - write full data to file
+
+2. On get_transactions:
+   - read from memory (NOT file)
+
+3. On startup:
+   - load file into memory once
+
+4. On clear_transactions:
+   - update memory
+   - update file
+
+---
+
+## Implementation Notes
+
+- Use built-in json module
+- Ensure file is created if not exists
+- Handle empty file safely
+
+---
+
+## Output
+
+Return updated storage.py only.
+
+---
+
+# PROMPT V1.1 - TASK 5.1: Persistence Fix (Reload Safety)
+
+## Context
+
+Persistence was implemented in storage.py.
+
+---
+
+## Task
+
+Ensure safe reload behavior.
+
+---
+
+## Scope
+
+Modify only:
+- app/storage.py
+
+---
+
+## Constraints
+
+- Do NOT change existing APIs
+- Do NOT change JSON structure
+- Do NOT change persistence logic
+
+---
+
+## Required Changes
+
+1. Add USER_TRANSACTIONS.clear() at the start of _load_from_file
+2. Ensure file ends with newline
+
+---
+
+## Output
+
+Return updated storage.py only.
