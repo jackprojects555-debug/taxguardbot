@@ -8,8 +8,9 @@ from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filte
 from app.calculations import calculate_income_split
 from app.message_store import format_message
 from app.models import Transaction
+from app.onboarding import handle_onboarding, start_onboarding
 from app.storage import add_transaction, clear_transactions, get_transactions
-from app.user_storage import get_user, is_user_blocked, upsert_from_telegram
+from app.user_storage import get_user, is_user_blocked, update_user_profile, upsert_from_telegram
 
 load_dotenv()
 
@@ -33,6 +34,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = update.message.text.strip()
     user_id = tg_user.id
+    user = get_user(user_id)
+
+    if user and not user.onboarding_completed:
+        if user.onboarding_step is None:
+            reply = start_onboarding(user_id)
+        else:
+            reply, _done = handle_onboarding(user, text)
+        await update.message.reply_text(reply)
+        return
+
+    if user and not user.profile_notified:
+        update_user_profile(user_id, profile_notified=True)
+        await update.message.reply_text(format_message("profile_notified_he"))
 
     if text.lower() == "reset" or text in ("אפס", "נקה", "מחק"):
         clear_transactions(user_id)
@@ -74,8 +88,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     try:
-        user = get_user(user_id)
-
         # VAT default: VAT-exempt users never include VAT regardless of input.
         # Registered users use their profile default; "נוכה" overrides to False.
         if user and user.business_type == "vat_exempt":
