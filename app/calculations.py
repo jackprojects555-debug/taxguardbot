@@ -23,10 +23,7 @@ def calculate_income_split(
     social_savings_amount = base_amount * social_savings_rate
 
     total_to_save = (
-        vat_amount
-        + income_tax_amount
-        + national_insurance_amount
-        + social_savings_amount
+        vat_amount + income_tax_amount + national_insurance_amount + social_savings_amount
     )
 
     available_amount = amount - total_to_save

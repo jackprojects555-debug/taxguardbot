@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
-from app.models import Transaction
 
+from app.models import Transaction
 
 # storage לפי משתמש (telegram_id)
 USER_TRANSACTIONS: Dict[int, List[Transaction]] = {}
@@ -74,8 +74,7 @@ def _load_from_file():
     for user_id_str, raw_transactions in payload.items():
         user_id = int(user_id_str)
         USER_TRANSACTIONS[user_id] = [
-            _dict_to_transaction(raw_transaction)
-            for raw_transaction in raw_transactions
+            _dict_to_transaction(raw_transaction) for raw_transaction in raw_transactions
         ]
 
 

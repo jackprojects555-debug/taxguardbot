@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Annotated, Any, Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
@@ -13,7 +13,6 @@ from pydantic.functional_validators import field_validator
 
 from app.message_store import get_messages_snapshot, replace_messages
 from app.storage import (
-    USER_TRANSACTIONS,
     delete_all_transactions,
     get_transactions,
     list_user_ids_with_transactions,

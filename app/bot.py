@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 
@@ -19,9 +18,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_user = update.effective_user
-    display_name_parts = [
-        part for part in (tg_user.first_name, tg_user.last_name) if part
-    ]
+    display_name_parts = [part for part in (tg_user.first_name, tg_user.last_name) if part]
     display_name = " ".join(display_name_parts).strip() or None
 
     upsert_from_telegram(

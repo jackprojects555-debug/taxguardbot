@@ -2,10 +2,10 @@ import pytest
 
 from app.calculations import calculate_income_split
 
-
 # ---------------------------------------------------------------------------
 # Return shape
 # ---------------------------------------------------------------------------
+
 
 def test_returns_all_keys():
     result = calculate_income_split(10000, vat_included=False)
@@ -26,6 +26,7 @@ def test_returns_all_keys():
 # VAT-included (canonical example: ₪11,700)
 # ---------------------------------------------------------------------------
 
+
 def test_vat_included_standard_amount():
     r = calculate_income_split(11700, vat_included=True)
     assert r["amount"] == 11700
@@ -45,14 +46,13 @@ def test_vat_included_base_equals_amount_minus_vat():
 
 def test_vat_included_available_equals_amount_minus_total_to_save():
     r = calculate_income_split(11700, vat_included=True)
-    assert r["available_amount"] == pytest.approx(
-        r["amount"] - r["total_to_save"], rel=1e-9
-    )
+    assert r["available_amount"] == pytest.approx(r["amount"] - r["total_to_save"], rel=1e-9)
 
 
 # ---------------------------------------------------------------------------
 # VAT-excluded
 # ---------------------------------------------------------------------------
+
 
 def test_vat_excluded_vat_is_zero():
     r = calculate_income_split(10000, vat_included=False)
@@ -75,14 +75,13 @@ def test_vat_excluded_totals():
 
 def test_vat_excluded_available_equals_amount_minus_total_to_save():
     r = calculate_income_split(10000, vat_included=False)
-    assert r["available_amount"] == pytest.approx(
-        r["amount"] - r["total_to_save"], rel=1e-9
-    )
+    assert r["available_amount"] == pytest.approx(r["amount"] - r["total_to_save"], rel=1e-9)
 
 
 # ---------------------------------------------------------------------------
 # Custom rates
 # ---------------------------------------------------------------------------
+
 
 def test_custom_income_tax_rate():
     r = calculate_income_split(10000, vat_included=False, income_tax_rate=0.30)
@@ -115,6 +114,7 @@ def test_zero_all_rates_vat_excluded():
 # Input validation
 # ---------------------------------------------------------------------------
 
+
 def test_zero_raises():
     with pytest.raises(ValueError):
         calculate_income_split(0)
@@ -133,6 +133,7 @@ def test_very_small_positive_does_not_raise():
 # ---------------------------------------------------------------------------
 # Accounting identity: total_to_save components sum correctly
 # ---------------------------------------------------------------------------
+
 
 def test_total_to_save_is_sum_of_components_vat_included():
     r = calculate_income_split(11700, vat_included=True)
