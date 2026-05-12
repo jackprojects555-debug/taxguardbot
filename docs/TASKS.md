@@ -7,11 +7,11 @@ Active and backlog tasks. Update status when work starts or completes.
 ## In Progress
 
 ### [PROD-001] Per-user onboarding and tax rate configuration
-Status: In progress
+Status: In review
 Branch: feature/prod-001-onboarding
+PR: #6
 Scope: BotUser model fields, onboarding state machine, bot routing, admin API exposure
-Commits done: A (model), B (wire rates), C (onboarding flow + tests)
-Remaining: Commit D — admin API fields for new profile fields
+Commits: A (model), B (wire rates), C (onboarding flow + tests), D (admin API)
 
 ---
 
