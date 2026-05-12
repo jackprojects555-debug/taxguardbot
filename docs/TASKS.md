@@ -6,15 +6,15 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-005] Automated reminders
-Status: In review
-Branch: feature/prod-005-reminders
-Scope: mid-month (15th) and end-of-month reports via PTB JobQueue
-Commits: A (report builders + message keys + tests), B (bot wiring)
+_(none)_
 
 ---
 
 ## Done
+
+### [PROD-005] Automated reminders
+Status: Complete
+Merged: feature/prod-005-reminders → main (PR #11)
 
 ### [PROD-004] Correction commands
 Status: Complete
@@ -43,9 +43,6 @@ Merged: feature/engineering-migration → main
 ---
 
 ## Backlog — Product
-
-### [PROD-005] Automated reminders
-Status: In review — see In Progress section above
 
 ### [PROD-006] Database migration
 Status: Not started
