@@ -90,8 +90,7 @@ def _load_from_file():
     for user_id_str, raw_transactions in payload.items():
         user_id = int(user_id_str)
         USER_TRANSACTIONS[user_id] = [
-            _dict_to_transaction(raw, idx + 1)
-            for idx, raw in enumerate(raw_transactions)
+            _dict_to_transaction(raw, idx + 1) for idx, raw in enumerate(raw_transactions)
         ]
 
 
