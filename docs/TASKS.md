@@ -6,7 +6,11 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-_(none)_
+### [PROD-006] Database migration
+Status: In review
+Branch: feature/prod-006-database
+Scope: SQLite via stdlib sqlite3; storage.py + user_storage.py rewritten; migration script
+Commits: A (schema + test fixture), B (storage.py), C (user_storage.py), D (test cleanup), E (migration script)
 
 ---
 
@@ -45,6 +49,4 @@ Merged: feature/engineering-migration → main
 ## Backlog — Product
 
 ### [PROD-006] Database migration
-Status: Not started
-Notes: Replace JSON file storage with a real database.
-Prerequisite: PROD-001 or PROD-002 (schema clearer once user model is extended)
+Status: In review — see In Progress section above
