@@ -34,40 +34,24 @@ def _make_transaction(**overrides) -> Transaction:
 # ---------------------------------------------------------------------------
 
 
-def test_midmonth_no_transactions_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_no_transactions_returns_none():
 
     assert build_midmonth_report(1, MONTH) is None
 
 
-def test_midmonth_only_canceled_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_only_canceled_returns_none():
 
     add_transaction(1, _make_transaction(status="canceled"))
     assert build_midmonth_report(1, MONTH) is None
 
 
-def test_midmonth_wrong_month_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_wrong_month_returns_none():
 
     add_transaction(1, _make_transaction(month="2026-04"))
     assert build_midmonth_report(1, MONTH) is None
 
 
-def test_midmonth_contains_income(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_contains_income():
 
     add_transaction(1, _make_transaction(amount=11700.0))
     report = build_midmonth_report(1, MONTH)
@@ -75,22 +59,14 @@ def test_midmonth_contains_income(tmp_path, monkeypatch):
     assert "11,700" in report
 
 
-def test_midmonth_contains_month(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_contains_month():
 
     add_transaction(1, _make_transaction())
     report = build_midmonth_report(1, MONTH)
     assert MONTH in report
 
 
-def test_midmonth_aggregates_multiple_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_aggregates_multiple_transactions():
 
     add_transaction(
         1,
@@ -109,11 +85,7 @@ def test_midmonth_aggregates_multiple_transactions(tmp_path, monkeypatch):
     assert "4,500" in report  # total_to_save
 
 
-def test_midmonth_skips_canceled_in_aggregation(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_skips_canceled_in_aggregation():
 
     add_transaction(
         1, _make_transaction(amount=5000.0, total_to_save=2000.0, remaining_amount=2000.0)
@@ -124,11 +96,7 @@ def test_midmonth_skips_canceled_in_aggregation(tmp_path, monkeypatch):
     assert "5,000" in report
 
 
-def test_midmonth_gap_excludes_fully_saved(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_midmonth_gap_excludes_fully_saved():
 
     add_transaction(
         1,
@@ -151,30 +119,18 @@ def test_midmonth_gap_excludes_fully_saved(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_endmonth_no_transactions_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_no_transactions_returns_none():
 
     assert build_endmonth_report(1, MONTH) is None
 
 
-def test_endmonth_only_canceled_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_only_canceled_returns_none():
 
     add_transaction(1, _make_transaction(status="canceled"))
     assert build_endmonth_report(1, MONTH) is None
 
 
-def test_endmonth_contains_all_breakdown_fields(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_contains_all_breakdown_fields():
 
     add_transaction(1, _make_transaction())
     report = build_endmonth_report(1, MONTH)
@@ -187,22 +143,14 @@ def test_endmonth_contains_all_breakdown_fields(tmp_path, monkeypatch):
     assert "5,000" in report  # total_to_save
 
 
-def test_endmonth_contains_month(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_contains_month():
 
     add_transaction(1, _make_transaction())
     report = build_endmonth_report(1, MONTH)
     assert MONTH in report
 
 
-def test_endmonth_aggregates_multiple_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_aggregates_multiple_transactions():
 
     add_transaction(
         1,
@@ -234,11 +182,7 @@ def test_endmonth_aggregates_multiple_transactions(tmp_path, monkeypatch):
     assert "11,000" in report  # total income
 
 
-def test_endmonth_wrong_month_returns_none(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_endmonth_wrong_month_returns_none():
 
     add_transaction(1, _make_transaction(month="2026-04"))
     assert build_endmonth_report(1, MONTH) is None
