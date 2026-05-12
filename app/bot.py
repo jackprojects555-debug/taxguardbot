@@ -10,6 +10,7 @@ from app.message_store import format_message
 from app.models import Transaction
 from app.onboarding import handle_onboarding, start_onboarding
 from app.storage import add_transaction, clear_transactions, get_transactions
+from app.transfers import process_transfer
 from app.user_storage import get_user, is_user_blocked, update_user_profile, upsert_from_telegram
 
 load_dotenv()
@@ -47,6 +48,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user and not user.profile_notified:
         update_user_profile(user_id, profile_notified=True)
         await update.message.reply_text(format_message("profile_notified_he"))
+
+    if text == "העברתי" or text.startswith("העברתי "):
+        amount_text = text[len("העברתי"):].strip()
+        await update.message.reply_text(process_transfer(user_id, amount_text))
+        return
 
     if text.lower() == "reset" or text in ("אפס", "נקה", "מחק"):
         clear_transactions(user_id)
