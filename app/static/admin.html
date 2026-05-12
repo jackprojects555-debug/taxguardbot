@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TaxGuard Admin</title>
+  <style>
+    :root {
+      --bg: #0f1216;
+      --surface: #171b22;
+      --elevated: #1f2430;
+      --border: #2a3140;
+      --muted: #9aa3b2;
+      --text: #e8edf5;
+      --accent: #5b8cff;
+      --danger: #ff6b6b;
+      --success: #43d18a;
+      --radius: 10px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: radial-gradient(900px 520px at 20% -10%, #1a2740 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 52px; }
+    header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; }
+    h1 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 62ch; line-height: 1.45; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); background: rgba(31, 36, 48, 0.7); color: var(--muted); font-size: 12px; }
+    .card {
+      background: linear-gradient(180deg, rgba(31,36,48,0.95), rgba(23,27,34,0.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 12px 42px rgba(0,0,0,0.45);
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input[type="text"], input[type="password"], input[type="number"], textarea, select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+    }
+    textarea { min-height: 110px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.35; white-space: pre-wrap; }
+    input:focus, textarea:focus { border-color: #3f5fbf; box-shadow: 0 0 0 3px rgba(91,140,255,0.22); }
+    button {
+      appearance: none;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      padding: 9px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      color: #0b1324;
+      background: var(--accent);
+    }
+    button.secondary { background: var(--elevated); color: var(--text); border-color: var(--border); font-weight: 600; }
+    button.danger { background: transparent; border-color: rgba(255,107,107,0.65); color: #ffc7c7; font-weight: 700; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .tabs { display: flex; gap: 10px; margin: 16px 0 12px; }
+    .tabs button.tab {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-weight: 700;
+      padding: 10px 12px;
+    }
+    .tabs button.tab[data-active="true"] { color: var(--text); border-color: rgba(91,140,255,0.55); background: rgba(91,140,255,0.12); }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); color: var(--muted); }
+    .badge.warn { color: #ffd28a; border-color: rgba(255,210,138,0.35); }
+    .badge.bad { color: #ffc7c7; border-color: rgba(255,107,107,0.45); }
+    .grid { display: grid; gap: 12px; }
+    @media (min-width: 860px) {
+      .grid.two { grid-template-columns: 1fr 1fr; }
+    }
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .toast { margin-top: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: rgba(31,36,48,0.65); color: var(--text); font-size: 13px; }
+    .toast.ok { border-color: rgba(67,209,138,0.45); }
+    .toast.err { border-color: rgba(255,107,107,0.45); }
+    .split { height: 1px; background: var(--border); margin: 12px 0; }
+    dialog { border: none; border-radius: 12px; padding: 0; width: min(720px, calc(100% - 24px)); background: var(--surface); color: var(--text); }
+    dialog::backdrop { background: rgba(10,12,18,0.72); backdrop-filter: blur(6px); }
+    .modal-head { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 800; letter-spacing: -0.02em; }
+    .modal-body { padding: 14px 16px 18px; }
+    .modal-foot { padding: 12px 16px 16px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="row" style="align-items:flex-end;">
+          <h1>TaxGuard Admin</h1>
+          <span class="pill">Bearer token auth</span>
+        </div>
+        <div class="sub">Manage Telegram users stored in <span class="mono">data/users.json</span>. Edit bot copy backed by <span class="mono">data/messages.json</span>; the bot refreshes templates when the file changes.</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="grid two">
+        <div>
+          <label for="token">ADMIN_TOKEN</label>
+          <input id="token" type="password" autocomplete="off" placeholder="Paste token (sent as Authorization: Bearer …)" />
+          <div class="hint" style="margin-top:8px;">Stored only in this browser tab (localStorage). Generate a long random secret and set it in your environment for the admin process.</div>
+        </div>
+        <div class="row" style="align-items:flex-end; justify-content:flex-end;">
+          <button id="saveToken" class="secondary" type="button">Save token</button>
+          <button id="clearToken" class="secondary" type="button">Clear</button>
+        </div>
+      </div>
+      <div id="authToast" class="toast hidden"></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" type="button" data-tab="users" data-active="true">Users</button>
+      <button class="tab" type="button" data-tab="messages">Bot copy (CMS)</button>
+    </div>
+
+    <section id="panel-users" class="card">
+      <div class="row" style="justify-content:space-between; margin-bottom:12px;">
+        <div>
+          <div style="font-weight:800; letter-spacing:-0.02em;">Users</div>
+          <div class="hint">Rows include anyone with stored transactions even if they are not in the registry yet.</div>
+        </div>
+        <div class="row">
+          <button id="refreshUsers" class="secondary" type="button">Refresh</button>
+          <button id="openAddUser" type="button">Add user</button>
+        </div>
+      </div>
+      <div id="usersToast" class="toast hidden"></div>
+      <div style="overflow:auto; border:1px solid var(--border); border-radius: 10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Telegram ID</th>
+              <th>Profile</th>
+              <th>Flags</th>
+              <th>Txns</th>
+              <th style="width: 210px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="panel-messages" class="card hidden">
+      <div class="row" style="justify-content:space-between; margin-bottom:12px;">
+        <div>
+          <div style="font-weight:800; letter-spacing:-0.02em;">Bot copy</div>
+          <div class="hint">Use <span class="mono">{placeholders}</span> exactly as in the defaults. Keys ending in <span class="mono">_note</span> are documentation only.</div>
+        </div>
+        <div class="row">
+          <button id="refreshMessages" class="secondary" type="button">Reload</button>
+          <button id="saveMessages" type="button">Save all</button>
+        </div>
+      </div>
+      <div id="messagesToast" class="toast hidden"></div>
+      <div id="messagesEditor" class="grid"></div>
+    </section>
+  </div>
+
+  <dialog id="dlgAdd">
+    <div class="modal-head">Add or replace registry user</div>
+    <div class="modal-body grid">
+      <div class="grid two">
+        <div>
+          <label for="au_id">Telegram user id</label>
+          <input id="au_id" type="number" min="1" step="1" />
+        </div>
+        <div>
+          <label for="au_blocked">Blocked</label>
+          <select id="au_blocked">
+            <option value="false" selected>No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <label for="au_username">Username (optional)</label>
+          <input id="au_username" type="text" placeholder="@handle without @" />
+        </div>
+        <div>
+          <label for="au_display">Display name (optional)</label>
+          <input id="au_display" type="text" />
+        </div>
+      </div>
+      <div>
+        <label for="au_notes">Notes</label>
+        <textarea id="au_notes" style="min-height:88px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="secondary" type="button" data-close="dlgAdd">Cancel</button>
+      <button type="button" id="au_save">Save</button>
+    </div>
+  </dialog>
+
+  <dialog id="dlgEdit">
+    <div class="modal-head">Edit user</div>
+    <div class="modal-body grid">
+      <input type="hidden" id="eu_id" />
+      <div class="grid two">
+        <div>
+          <label>Telegram user id</label>
+          <input id="eu_id_ro" type="text" disabled />
+        </div>
+        <div>
+          <label for="eu_blocked">Blocked</label>
+          <select id="eu_blocked">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <label for="eu_username">Username</label>
+          <input id="eu_username" type="text" />
+        </div>
+        <div>
+          <label for="eu_display">Display name</label>
+          <input id="eu_display" type="text" />
+        </div>
+      </div>
+      <div>
+        <label for="eu_notes">Notes</label>
+        <textarea id="eu_notes"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="secondary" type="button" data-close="dlgEdit">Cancel</button>
+      <button type="button" id="eu_save">Save</button>
+    </div>
+  </dialog>
+
+  <dialog id="dlgReview">
+    <div class="modal-head">Stored transactions</div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:10px;">User <span class="mono" id="rv_id"></span> — newest last.</div>
+      <div style="overflow:auto; max-height: 52vh; border: 1px solid var(--border); border-radius: 10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>When</th>
+              <th>Amount</th>
+              <th>VAT?</th>
+              <th>To save</th>
+              <th>Available</th>
+            </tr>
+          </thead>
+          <tbody id="rv_rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="secondary" type="button" data-close="dlgReview">Close</button>
+    </div>
+  </dialog>
+
+  <script>
+    const LS_KEY = 'taxguard_admin_token';
+
+    const $ = (sel) => document.querySelector(sel);
+    const toast = (el, ok, msg) => {
+      el.textContent = msg;
+      el.classList.remove('hidden', 'ok', 'err');
+      el.classList.add(ok ? 'ok' : 'err');
+    };
+
+    function getToken() {
+      return localStorage.getItem(LS_KEY) || '';
+    }
+
+    function authHeaders() {
+      const t = getToken().trim();
+      return { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' };
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, { ...opts, headers: { ...(opts.headers||{}), ...authHeaders() } });
+      let body = null;
+      try { body = await res.json(); } catch { body = null; }
+      if (!res.ok) {
+        const detail = body && body.detail ? (typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail)) : res.statusText;
+        throw new Error(detail || 'Request failed');
+      }
+      return body;
+    }
+
+    function setTab(name) {
+      for (const b of document.querySelectorAll('.tab')) {
+        b.dataset.active = (b.dataset.tab === name) ? 'true' : 'false';
+      }
+      $('#panel-users').classList.toggle('hidden', name !== 'users');
+      $('#panel-messages').classList.toggle('hidden', name !== 'messages');
+    }
+
+    $('#saveToken').addEventListener('click', () => {
+      localStorage.setItem(LS_KEY, $('#token').value.trim());
+      toast($('#authToast'), true, 'Token saved locally for this browser.');
+    });
+    $('#clearToken').addEventListener('click', () => {
+      localStorage.removeItem(LS_KEY);
+      $('#token').value = '';
+      toast($('#authToast'), true, 'Token cleared.');
+    });
+
+    document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+    function openDlg(id, open=true) {
+      const d = document.getElementById(id);
+      if (!d) return;
+      if (open) { d.showModal(); } else { d.close(); }
+    }
+    document.querySelectorAll('[data-close]').forEach((b) =>
+      b.addEventListener('click', () => openDlg(b.dataset.close, false))
+    );
+
+    function openUserDialog(prefillId = null) {
+      $('#au_username').value = '';
+      $('#au_display').value = '';
+      $('#au_notes').value = '';
+      $('#au_blocked').value = 'false';
+      const idInput = $('#au_id');
+      if (prefillId != null && Number.isFinite(prefillId)) {
+        idInput.value = String(prefillId);
+        idInput.readOnly = true;
+        idInput.setAttribute('readonly', 'readonly');
+      } else {
+        idInput.value = '';
+        idInput.readOnly = false;
+        idInput.removeAttribute('readonly');
+      }
+      openDlg('dlgAdd', true);
+    }
+
+    $('#openAddUser').addEventListener('click', () => openUserDialog(null));
+
+    async function loadUsers() {
+      try {
+        const data = await api('/api/admin/users');
+        const body = $('#usersBody');
+        body.innerHTML = '';
+        for (const u of data.users) {
+          const tr = document.createElement('tr');
+          const implicit = !!u.implicit_only;
+          const badges = [];
+          if (implicit) badges.push('<span class="badge warn">implicit</span>');
+          if (u.is_blocked) badges.push('<span class="badge bad">blocked</span>');
+          tr.innerHTML = `
+            <td class="mono">${u.telegram_user_id}</td>
+            <td>
+              <div>${u.display_name ? escapeHtml(u.display_name) : '<span class="hint">—</span>'}</div>
+              <div class="hint mono">@${u.username ? escapeHtml(u.username) : '—'}</div>
+              <div class="hint" style="margin-top:6px;">${u.notes ? escapeHtml(u.notes) : ''}</div>
+            </td>
+            <td>${badges.join(' ') || '<span class="hint">—</span>'}</td>
+            <td class="mono">${u.transaction_count}</td>
+            <td class="row" style="gap:8px; flex-wrap:wrap;">
+              <button class="secondary" type="button" data-act="review" data-id="${u.telegram_user_id}">Review</button>
+              <button class="secondary" type="button" data-act="edit" data-id="${u.telegram_user_id}" data-implicit="${implicit ? '1' : '0'}">${implicit ? 'Register' : 'Edit'}</button>
+              <button class="danger" type="button" data-act="del" data-id="${u.telegram_user_id}">Delete</button>
+            </td>
+          `;
+          body.appendChild(tr);
+        }
+        body.querySelectorAll('button[data-act]').forEach((btn) => {
+          btn.addEventListener('click', () => onUserAction(btn.dataset.act, Number(btn.dataset.id), btn));
+        });
+        toast($('#usersToast'), true, `Loaded ${data.users.length} user row(s).`);
+      } catch (e) {
+        toast($('#usersToast'), false, e.message || String(e));
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function onUserAction(act, id, btn) {
+      if (act === 'review') {
+        try {
+          const data = await api(`/api/admin/users/${id}/transactions`);
+          $('#rv_id').textContent = String(id);
+          const tbody = $('#rv_rows');
+          tbody.innerHTML = '';
+          for (const t of data.transactions) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="mono">${escapeHtml(t.created_at)}</td>
+              <td class="mono">₪${Number(t.amount).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+              <td class="mono">${t.vat_included ? 'incl.' : 'excl.'}</td>
+              <td class="mono">₪${Number(t.total_to_save).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+              <td class="mono">₪${Number(t.available_amount).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+            `;
+            tbody.appendChild(tr);
+          }
+          openDlg('dlgReview', true);
+        } catch (e) {
+          toast($('#usersToast'), false, e.message || String(e));
+        }
+        return;
+      }
+      if (act === 'edit') {
+        const implicitBtn = btn && btn.dataset && btn.dataset.implicit === '1';
+        try {
+          if (implicitBtn) {
+            openUserDialog(id);
+            return;
+          }
+          const rows = await api('/api/admin/users');
+          const u = rows.users.find((x) => x.telegram_user_id === id);
+          if (!u || u.implicit_only) {
+            openUserDialog(id);
+            return;
+          }
+          $('#eu_id').value = String(id);
+          $('#eu_id_ro').value = String(id);
+          $('#eu_username').value = u.username || '';
+          $('#eu_display').value = u.display_name || '';
+          $('#eu_notes').value = u.notes || '';
+          $('#eu_blocked').value = u.is_blocked ? 'true' : 'false';
+          openDlg('dlgEdit', true);
+        } catch (e) {
+          toast($('#usersToast'), false, e.message || String(e));
+        }
+        return;
+      }
+      if (act === 'del') {
+        const clear = confirm(
+          `Delete registry entry for ${id}?\n\nOK = also delete stored transactions\nCancel = keep transactions (only removes registry row if present)`
+        );
+        const delTx = clear;
+        try {
+          const qs = delTx ? '?delete_transactions=true' : '';
+          await api(`/api/admin/users/${id}${qs}`, { method: 'DELETE' });
+          toast($('#usersToast'), true, delTx ? 'Deleted registry (if any) and cleared transactions.' : 'Deleted registry entry (if any).');
+          await loadUsers();
+        } catch (e) {
+          toast($('#usersToast'), false, e.message || String(e));
+        }
+      }
+    }
+
+    $('#au_save').addEventListener('click', async () => {
+      const id = Number($('#au_id').value);
+      if (!Number.isFinite(id) || id <= 0) {
+        toast($('#usersToast'), false, 'Telegram user id must be a positive integer.');
+        return;
+      }
+      const body = {
+        telegram_user_id: id,
+        username: $('#au_username').value.trim() || null,
+        display_name: $('#au_display').value.trim() || null,
+        notes: $('#au_notes').value || '',
+        is_blocked: $('#au_blocked').value === 'true',
+      };
+      try {
+        await api('/api/admin/users', { method: 'POST', body: JSON.stringify(body) });
+        openDlg('dlgAdd', false);
+        toast($('#usersToast'), true, 'User saved.');
+        await loadUsers();
+      } catch (e) {
+        toast($('#usersToast'), false, e.message || String(e));
+      }
+    });
+
+    $('#eu_save').addEventListener('click', async () => {
+      const id = Number($('#eu_id').value);
+      const body = {
+        username: $('#eu_username').value.trim() || null,
+        display_name: $('#eu_display').value.trim() || null,
+        notes: $('#eu_notes').value,
+        is_blocked: $('#eu_blocked').value === 'true',
+      };
+      try {
+        await api(`/api/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+        openDlg('dlgEdit', false);
+        toast($('#usersToast'), true, 'User updated.');
+        await loadUsers();
+      } catch (e) {
+        toast($('#usersToast'), false, e.message || String(e));
+      }
+    });
+
+    let messagesDraft = {};
+
+    function renderMessagesEditor() {
+      const root = $('#messagesEditor');
+      root.innerHTML = '';
+      const keys = Object.keys(messagesDraft).sort();
+      for (const k of keys) {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = `
+          <label for="msg_${k}">${escapeHtml(k)}</label>
+          <textarea id="msg_${k}"></textarea>
+        `;
+        root.appendChild(wrap);
+        const ta = wrap.querySelector('textarea');
+        ta.value = messagesDraft[k];
+        ta.addEventListener('input', () => { messagesDraft[k] = ta.value; });
+      }
+    }
+
+    async function loadMessages() {
+      try {
+        const data = await api('/api/admin/messages');
+        messagesDraft = { ...data.messages };
+        renderMessagesEditor();
+        toast($('#messagesToast'), true, `Loaded ${Object.keys(messagesDraft).length} key(s).`);
+      } catch (e) {
+        toast($('#messagesToast'), false, e.message || String(e));
+      }
+    }
+
+    async function saveMessages() {
+      try {
+        const data = await api('/api/admin/messages', { method: 'PUT', body: JSON.stringify({ messages: messagesDraft }) });
+        messagesDraft = { ...data.messages };
+        renderMessagesEditor();
+        toast($('#messagesToast'), true, 'Saved messages to disk.');
+      } catch (e) {
+        toast($('#messagesToast'), false, e.message || String(e));
+      }
+    }
+
+    $('#refreshUsers').addEventListener('click', loadUsers);
+    $('#refreshMessages').addEventListener('click', loadMessages);
+    $('#saveMessages').addEventListener('click', saveMessages);
+
+    $('#token').value = getToken();
+    setTab('users');
+    loadUsers();
+    loadMessages();
+  </script>
+</body>
+</html>
