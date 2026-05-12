@@ -1,20 +1,19 @@
-"""Tests for BotUser model, serialization, and backward compatibility."""
-
-import json
+"""Tests for BotUser model and SQLite-backed user storage."""
 
 import pytest
 
 from app.user_storage import (
     BotUser,
-    _dict_to_user,
-    _user_to_dict,
+    delete_user_record,
     get_user,
+    is_user_blocked,
+    list_registered_users,
     update_user_profile,
     upsert_from_telegram,
 )
 
 # ---------------------------------------------------------------------------
-# BotUser defaults — new user created without profile fields
+# BotUser dataclass defaults
 # ---------------------------------------------------------------------------
 
 
@@ -59,178 +58,149 @@ def test_new_user_default_social_savings_rate():
 
 
 # ---------------------------------------------------------------------------
-# Backward compatibility — loading old JSON records (no new fields)
-# ---------------------------------------------------------------------------
-
-OLD_FORMAT_RECORD = {
-    "telegram_user_id": 999,
-    "username": "olduser",
-    "display_name": "Old User",
-    "notes": "",
-    "is_blocked": False,
-    "created_at": "2026-01-01T10:00:00",
-    "updated_at": "2026-01-01T10:00:00",
-}
-
-
-def test_old_record_loads_without_error():
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.telegram_user_id == 999
-
-
-def test_old_record_onboarding_completed_defaults_true():
-    """Existing users must not be re-onboarded after PROD-001 upgrade."""
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.onboarding_completed is True
-
-
-def test_old_record_profile_notified_defaults_false():
-    """Existing users should receive the one-time profile defaults notification."""
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.profile_notified is False
-
-
-def test_old_record_rates_match_previous_hardcoded_values():
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.income_tax_rate == pytest.approx(0.20)
-    assert user.national_insurance_rate == pytest.approx(0.08)
-    assert user.social_savings_rate == pytest.approx(0.05)
-
-
-def test_old_record_business_type_defaults_vat_registered():
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.business_type == "vat_registered"
-
-
-def test_old_record_vat_included_default_true():
-    user = _dict_to_user(OLD_FORMAT_RECORD)
-    assert user.vat_included_default is True
-
-
-# ---------------------------------------------------------------------------
-# Serialization round-trip — new fields survive save/load
+# upsert_from_telegram
 # ---------------------------------------------------------------------------
 
 
-def test_round_trip_preserves_business_type():
-    u = BotUser(telegram_user_id=1, business_type="vat_exempt")
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.business_type == "vat_exempt"
+def test_upsert_creates_new_user():
+    user = upsert_from_telegram(telegram_user_id=1, username="alice")
+    assert user is not None
+    assert user.telegram_user_id == 1
+    assert user.username == "alice"
 
 
-def test_round_trip_preserves_vat_included_default():
-    u = BotUser(telegram_user_id=1, vat_included_default=False)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.vat_included_default is False
+def test_upsert_is_idempotent():
+    upsert_from_telegram(telegram_user_id=1, username="alice")
+    upsert_from_telegram(telegram_user_id=1, username="alice")
+    assert len(list_registered_users()) == 1
 
 
-def test_round_trip_preserves_income_tax_rate():
-    u = BotUser(telegram_user_id=1, income_tax_rate=0.30)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.income_tax_rate == pytest.approx(0.30)
+def test_upsert_updates_username():
+    upsert_from_telegram(telegram_user_id=1, username="alice")
+    upsert_from_telegram(telegram_user_id=1, username="alice2")
+    assert get_user(1).username == "alice2"
 
 
-def test_round_trip_preserves_national_insurance_rate():
-    u = BotUser(telegram_user_id=1, national_insurance_rate=0.12)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.national_insurance_rate == pytest.approx(0.12)
-
-
-def test_round_trip_preserves_social_savings_rate():
-    u = BotUser(telegram_user_id=1, social_savings_rate=0.0)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.social_savings_rate == pytest.approx(0.0)
-
-
-def test_round_trip_preserves_onboarding_completed():
-    u = BotUser(telegram_user_id=1, onboarding_completed=True)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.onboarding_completed is True
-
-
-def test_round_trip_preserves_onboarding_step():
-    u = BotUser(telegram_user_id=1, onboarding_step="income_tax")
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.onboarding_step == "income_tax"
-
-
-def test_round_trip_preserves_profile_notified():
-    u = BotUser(telegram_user_id=1, profile_notified=True)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.profile_notified is True
-
-
-def test_round_trip_onboarding_step_none():
-    u = BotUser(telegram_user_id=1, onboarding_step=None)
-    reloaded = _dict_to_user(_user_to_dict(u))
-    assert reloaded.onboarding_step is None
+def test_upsert_preserves_profile_fields():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, income_tax_rate=0.30)
+    upsert_from_telegram(telegram_user_id=1, username="alice")
+    assert get_user(1).income_tax_rate == pytest.approx(0.30)
 
 
 # ---------------------------------------------------------------------------
-# update_user_profile — field updates and persistence
+# get_user
 # ---------------------------------------------------------------------------
 
 
-def test_update_user_profile_income_tax_rate(tmp_path, monkeypatch):
-    import app.user_storage as us
+def test_get_user_returns_none_for_unknown():
+    assert get_user(99999) is None
 
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
 
-    upsert_from_telegram(telegram_user_id=42, username="test")
-    update_user_profile(42, income_tax_rate=0.30)
-
+def test_get_user_returns_correct_user():
+    upsert_from_telegram(telegram_user_id=42, username="bob")
     user = get_user(42)
-    assert user.income_tax_rate == pytest.approx(0.30)
+    assert user.username == "bob"
 
 
-def test_update_user_profile_onboarding_step(tmp_path, monkeypatch):
-    import app.user_storage as us
+# ---------------------------------------------------------------------------
+# update_user_profile
+# ---------------------------------------------------------------------------
 
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
 
-    upsert_from_telegram(telegram_user_id=42, username="test")
-    update_user_profile(42, onboarding_step="income_tax", onboarding_completed=False)
+def test_update_income_tax_rate():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, income_tax_rate=0.30)
+    assert get_user(1).income_tax_rate == pytest.approx(0.30)
 
-    user = get_user(42)
+
+def test_update_onboarding_step():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, onboarding_step="income_tax", onboarding_completed=False)
+    user = get_user(1)
     assert user.onboarding_step == "income_tax"
     assert user.onboarding_completed is False
 
 
-def test_update_user_profile_unknown_field_ignored(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
-
-    upsert_from_telegram(telegram_user_id=42, username="test")
-    update_user_profile(42, nonexistent_field="value")  # must not raise
-
-    user = get_user(42)
-    assert user is not None
+def test_update_profile_notified():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, profile_notified=True)
+    assert get_user(1).profile_notified is True
 
 
-def test_update_user_profile_missing_user_returns_none(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
-
-    result = update_user_profile(99999, income_tax_rate=0.10)
-    assert result is None
+def test_update_business_type():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, business_type="vat_exempt", vat_included_default=False)
+    user = get_user(1)
+    assert user.business_type == "vat_exempt"
+    assert user.vat_included_default is False
 
 
-def test_update_user_profile_persists_to_disk(tmp_path, monkeypatch):
-    import app.user_storage as us
+def test_update_unknown_field_ignored():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, nonexistent_field="value")
+    assert get_user(1) is not None
 
-    users_file = tmp_path / "users.json"
-    monkeypatch.setattr(us, "USERS_FILE", users_file)
-    monkeypatch.setattr(us, "USERS", {})
 
-    upsert_from_telegram(telegram_user_id=42, username="test")
-    update_user_profile(42, income_tax_rate=0.10, profile_notified=True)
+def test_update_missing_user_returns_none():
+    assert update_user_profile(99999, income_tax_rate=0.10) is None
 
-    raw = json.loads(users_file.read_text())
-    assert raw["42"]["income_tax_rate"] == pytest.approx(0.10)
-    assert raw["42"]["profile_notified"] is True
+
+def test_update_persists_across_get():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, income_tax_rate=0.10, national_insurance_rate=0.12)
+    user = get_user(1)
+    assert user.income_tax_rate == pytest.approx(0.10)
+    assert user.national_insurance_rate == pytest.approx(0.12)
+
+
+# ---------------------------------------------------------------------------
+# is_user_blocked / block flag
+# ---------------------------------------------------------------------------
+
+
+def test_new_user_not_blocked():
+    upsert_from_telegram(telegram_user_id=1)
+    assert is_user_blocked(1) is False
+
+
+def test_block_user():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, is_blocked=True)
+    assert is_user_blocked(1) is True
+
+
+def test_unknown_user_not_blocked():
+    assert is_user_blocked(99999) is False
+
+
+# ---------------------------------------------------------------------------
+# delete_user_record
+# ---------------------------------------------------------------------------
+
+
+def test_delete_existing_user_returns_true():
+    upsert_from_telegram(telegram_user_id=1)
+    assert delete_user_record(1) is True
+    assert get_user(1) is None
+
+
+def test_delete_missing_user_returns_false():
+    assert delete_user_record(99999) is False
+
+
+# ---------------------------------------------------------------------------
+# list_registered_users
+# ---------------------------------------------------------------------------
+
+
+def test_list_registered_users_empty():
+    assert list_registered_users() == []
+
+
+def test_list_registered_users_returns_all():
+    upsert_from_telegram(telegram_user_id=1)
+    upsert_from_telegram(telegram_user_id=2)
+    ids = [u.telegram_user_id for u in list_registered_users()]
+    assert 1 in ids
+    assert 2 in ids
