@@ -6,6 +6,14 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 
 from app.calculations import calculate_income_split
+from app.corrections import (
+    cancel_by_id,
+    cancel_last,
+    correct_by_id,
+    correct_last,
+    show_last,
+    show_list,
+)
 from app.message_store import format_message
 from app.models import Transaction
 from app.onboarding import handle_onboarding, start_onboarding
@@ -94,6 +102,44 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         await update.message.reply_text(response)
+        return
+
+    if text == "אחרון":
+        await update.message.reply_text(show_last(user_id))
+        return
+
+    if text == "רשימה":
+        await update.message.reply_text(show_list(user_id))
+        return
+
+    if text == "בטל אחרון":
+        await update.message.reply_text(cancel_last(user_id))
+        return
+
+    if text.startswith("בטל "):
+        id_str = text[len("בטל ") :].strip()
+        try:
+            await update.message.reply_text(cancel_by_id(user_id, int(id_str)))
+        except ValueError:
+            await update.message.reply_text(format_message("transaction_not_found_he"))
+        return
+
+    if text.startswith("תקן אחרון "):
+        amount_str = text[len("תקן אחרון ") :].strip()
+        await update.message.reply_text(correct_last(user_id, amount_str, user))
+        return
+
+    if text.startswith("תקן "):
+        parts = text[len("תקן ") :].strip().split()
+        if len(parts) == 2:
+            id_str, amount_str = parts
+            try:
+                reply = correct_by_id(user_id, int(id_str), amount_str, user)
+            except ValueError:
+                reply = format_message("transaction_not_found_he")
+        else:
+            reply = format_message("transaction_not_found_he")
+        await update.message.reply_text(reply)
         return
 
     try:

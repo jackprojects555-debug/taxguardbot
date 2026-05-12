@@ -66,6 +66,27 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     "transfer_partial_success_he": "הועברו ₪{saved:,.0f}. נשאר להעברה: ₪{remaining:,.0f}",
     "transfer_no_open_he": "אין עסקאות פתוחות להעברה.",
     "transfer_invalid_amount_he": "סכום לא תקין.",
+    # Correction commands
+    "no_transactions_he": "אין עסקאות.",
+    "transaction_not_found_he": "עסקה לא נמצאה.",
+    "transaction_already_canceled_he": "עסקה זו כבר בוטלה.",
+    "transaction_canceled_cannot_correct_he": "לא ניתן לתקן עסקה מבוטלת.",
+    "cancel_success_he": "עסקה #{id} בוטלה.",
+    "correction_invalid_amount_he": "סכום לא תקין.",
+    "correction_success_he": (
+        "עסקה #{id} עודכנה לסכום ₪{amount:,.0f}.\n"
+        "לשמירה: ₪{total_to_save:,.0f} | פנוי: ₪{available_amount:,.0f}"
+    ),
+    "transaction_detail_he": (
+        "עסקה #{id} | {month}\n"
+        "נכנסו: ₪{amount:,.0f}\n"
+        "לשמירה: ₪{total_to_save:,.0f}\n"
+        "הועבר: ₪{saved_amount:,.0f}\n"
+        "נשאר: ₪{remaining_amount:,.0f}\n"
+        "סטטוס: {status}"
+    ),
+    "list_header_he": "עסקאות החודש:",
+    "transaction_list_row_he": "#{id} ₪{amount:,.0f} — {status}",
 }
 
 _MESSAGES: Dict[str, str] = deepcopy(_DEFAULT_MESSAGES)
