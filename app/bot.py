@@ -9,7 +9,7 @@ from app.calculations import calculate_income_split
 from app.message_store import format_message
 from app.models import Transaction
 from app.storage import add_transaction, clear_transactions, get_transactions
-from app.user_storage import is_user_blocked, upsert_from_telegram
+from app.user_storage import get_user, is_user_blocked, upsert_from_telegram
 
 load_dotenv()
 
@@ -74,9 +74,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     try:
-        vat_included = True
+        user = get_user(user_id)
 
-        if "נוכה" in text:
+        # VAT default: VAT-exempt users never include VAT regardless of input.
+        # Registered users use their profile default; "נוכה" overrides to False.
+        if user and user.business_type == "vat_exempt":
+            vat_included = False
+        elif user:
+            vat_included = user.vat_included_default
+        else:
+            vat_included = True
+
+        if "נוכה" in text and (not user or user.business_type != "vat_exempt"):
             vat_included = False
             text = text.replace("נוכה", "").strip()
 
@@ -106,6 +115,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = calculate_income_split(
             amount=amount,
             vat_included=vat_included,
+            income_tax_rate=user.income_tax_rate if user else 0.20,
+            national_insurance_rate=user.national_insurance_rate if user else 0.08,
+            social_savings_rate=user.social_savings_rate if user else 0.05,
         )
 
         transaction = Transaction(
