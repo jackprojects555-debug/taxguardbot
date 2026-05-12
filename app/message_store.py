@@ -29,6 +29,8 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
         "ביטוח לאומי: ₪{total_national_insurance:,.0f}\n"
         "סוציאליות: ₪{total_social_savings:,.0f}\n\n"
         "לשמירה: ₪{total_to_save:,.0f}\n"
+        "הועבר: ₪{total_saved:,.0f}\n"
+        "פער פתוח: ₪{total_gap:,.0f}\n\n"
         "פנוי: ₪{total_available:,.0f}"
     ),
     "invalid_input_empty_en": "Invalid input. Please enter a number.",
