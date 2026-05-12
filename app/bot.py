@@ -54,24 +54,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if text == "מצב":
-        transactions = get_transactions(user_id)
         now = datetime.now()
-        transactions = [
-            t
-            for t in transactions
-            if t.created_at.year == now.year and t.created_at.month == now.month
-        ]
+        current_month = now.strftime("%Y-%m")
+        all_txns = get_transactions(user_id)
+        active = [t for t in all_txns if t.month == current_month and t.status != "canceled"]
 
-        if not transactions:
+        if not active:
             response = format_message("status_no_data_he")
         else:
-            total_income = sum(t.amount for t in transactions)
-            total_vat = sum(t.vat_amount for t in transactions)
-            total_income_tax = sum(t.income_tax_amount for t in transactions)
-            total_national_insurance = sum(t.national_insurance_amount for t in transactions)
-            total_social_savings = sum(t.social_savings_amount for t in transactions)
-            total_to_save = sum(t.total_to_save for t in transactions)
-            total_available = sum(t.available_amount for t in transactions)
+            total_income = sum(t.amount for t in active)
+            total_vat = sum(t.vat_amount for t in active)
+            total_income_tax = sum(t.income_tax_amount for t in active)
+            total_national_insurance = sum(t.national_insurance_amount for t in active)
+            total_social_savings = sum(t.social_savings_amount for t in active)
+            total_to_save = sum(t.total_to_save for t in active)
+            total_saved = sum(t.saved_amount for t in active)
+            total_gap = sum(
+                t.remaining_amount for t in active if t.status in ("open", "partially_saved")
+            )
+            total_available = sum(t.available_amount for t in active)
 
             response = format_message(
                 "status_summary_he",
@@ -81,6 +82,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 total_national_insurance=total_national_insurance,
                 total_social_savings=total_social_savings,
                 total_to_save=total_to_save,
+                total_saved=total_saved,
+                total_gap=total_gap,
                 total_available=total_available,
             )
 
@@ -132,6 +135,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             social_savings_rate=user.social_savings_rate if user else 0.05,
         )
 
+        now = datetime.now()
         transaction = Transaction(
             amount=result["amount"],
             vat_included=vat_included,
@@ -141,8 +145,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             national_insurance_amount=result["national_insurance_amount"],
             social_savings_amount=result["social_savings_amount"],
             total_to_save=result["total_to_save"],
+            remaining_amount=result["total_to_save"],
             available_amount=result["available_amount"],
-            created_at=datetime.now(),
+            month=now.strftime("%Y-%m"),
+            created_at=now,
         )
 
         add_transaction(user_id, transaction)

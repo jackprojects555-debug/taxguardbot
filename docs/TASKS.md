@@ -6,16 +6,19 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-001] Per-user onboarding and tax rate configuration
-Status: In review
-Branch: feature/prod-001-onboarding
-PR: #6
-Scope: BotUser model fields, onboarding state machine, bot routing, admin API exposure
-Commits: A (model), B (wire rates), C (onboarding flow + tests), D (admin API)
+### [PROD-002] Transaction status tracking
+Status: In progress
+Branch: feature/prod-002-transaction-status
+Scope: Transaction model fields, storage layer, מצב gap reporting, admin API
+Commits: A (model + storage + tests), B (bot + admin API)
 
 ---
 
 ## Done
+
+### [PROD-001] Per-user onboarding and tax rate configuration
+Status: Complete
+Merged: feature/prod-001-onboarding → main (PR #6)
 
 ### [ENG-001] Engineering migration — Phase 1: Documentation
 Status: Complete
@@ -30,9 +33,7 @@ Merged: feature/engineering-migration → main
 ## Backlog — Product
 
 ### [PROD-002] Transaction status tracking
-Status: Not started
-Spec: MASTER_SPEC_V1.md section 10.5
-Notes: Add fields: status, saved_amount, remaining_amount, updated_at, canceled_at
+Status: In progress — see In Progress section above
 
 ### [PROD-003] Transfer confirmation commands
 Status: Not started

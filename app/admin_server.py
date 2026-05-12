@@ -54,6 +54,7 @@ async def verify_admin(authorization: str | None = Header(default=None)) -> None
 
 def _transaction_to_api(t) -> dict:
     return {
+        "id": t.id,
         "amount": t.amount,
         "vat_included": t.vat_included,
         "vat_amount": t.vat_amount,
@@ -62,8 +63,14 @@ def _transaction_to_api(t) -> dict:
         "national_insurance_amount": t.national_insurance_amount,
         "social_savings_amount": t.social_savings_amount,
         "total_to_save": t.total_to_save,
+        "remaining_amount": t.remaining_amount,
         "available_amount": t.available_amount,
+        "month": t.month,
         "created_at": t.created_at.isoformat(),
+        "status": t.status,
+        "saved_amount": t.saved_amount,
+        "updated_at": t.updated_at.isoformat() if t.updated_at else None,
+        "canceled_at": t.canceled_at.isoformat() if t.canceled_at else None,
     }
 
 
