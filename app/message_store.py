@@ -61,6 +61,11 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     "onboarding_invalid_business_type_he": "לא הבנתי. שלח 1 לעוסק מורשה או 2 לעוסק פטור.",
     "onboarding_invalid_yes_no_he": "לא הבנתי. שלח כן או לא.",
     "onboarding_invalid_rate_he": "לא הבנתי. שלח מספר, למשל: 20 או 0.20",
+    # Transfer confirmation
+    "transfer_full_success_he": "הועברו ₪{amount:,.0f} — עסקה נסגרה.",
+    "transfer_partial_success_he": "הועברו ₪{saved:,.0f}. נשאר להעברה: ₪{remaining:,.0f}",
+    "transfer_no_open_he": "אין עסקאות פתוחות להעברה.",
+    "transfer_invalid_amount_he": "סכום לא תקין.",
 }
 
 _MESSAGES: Dict[str, str] = deepcopy(_DEFAULT_MESSAGES)

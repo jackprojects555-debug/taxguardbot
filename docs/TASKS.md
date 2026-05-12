@@ -6,16 +6,20 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-002] Transaction status tracking
+### [PROD-003] Transfer confirmation commands
 Status: In review
-Branch: feature/prod-002-transaction-status
-PR: #7
-Scope: Transaction model fields, storage layer, מצב gap reporting, admin API
-Commits: A (model + storage + tests), B (bot + admin API)
+Branch: feature/prod-003-transfer-commands
+PR: #8
+Scope: process_transfer logic, העברתי / העברתי {amount} bot commands
+Commits: A (transfers module + tests), B (bot wiring)
 
 ---
 
 ## Done
+
+### [PROD-002] Transaction status tracking
+Status: Complete
+Merged: feature/prod-002-transaction-status → main (PR #7)
 
 ### [PROD-001] Per-user onboarding and tax rate configuration
 Status: Complete
@@ -33,13 +37,8 @@ Merged: feature/engineering-migration → main
 
 ## Backlog — Product
 
-### [PROD-002] Transaction status tracking
-Status: In progress — see In Progress section above
-
 ### [PROD-003] Transfer confirmation commands
-Status: Not started
-Spec: MASTER_SPEC_V1.md section 10.4
-Notes: `העברתי` (full), `העברתי {amount}` (partial)
+Status: In review — see In Progress section above
 
 ### [PROD-004] Correction commands
 Status: Not started
