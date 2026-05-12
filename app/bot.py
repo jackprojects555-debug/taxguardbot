@@ -1,5 +1,6 @@
 import os
-from datetime import datetime
+from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from telegram import Update
@@ -17,9 +18,20 @@ from app.corrections import (
 from app.message_store import format_message
 from app.models import Transaction
 from app.onboarding import handle_onboarding, start_onboarding
+from app.reminders import send_endmonth_reports, send_midmonth_reports
 from app.storage import add_transaction, clear_transactions, get_transactions
 from app.transfers import process_transfer
 from app.user_storage import get_user, is_user_blocked, update_user_profile, upsert_from_telegram
+
+_TZ = ZoneInfo("Asia/Jerusalem")
+_REPORT_TIME = time(9, 0, tzinfo=_TZ)
+
+
+async def _end_of_month_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+    today = datetime.now(_TZ)
+    if (today + timedelta(days=1)).month != today.month:
+        await send_endmonth_reports(context)
+
 
 load_dotenv()
 
@@ -228,6 +240,10 @@ def main():
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    jq = app.job_queue
+    jq.run_monthly(send_midmonth_reports, when=_REPORT_TIME, day=15)
+    jq.run_daily(_end_of_month_job, time=_REPORT_TIME)
 
     print("Bot is running...")
     app.run_polling()

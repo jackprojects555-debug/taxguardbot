@@ -1,5 +1,5 @@
 wheel==0.46.3
-python-telegram-bot>=21.9
+python-telegram-bot[job-queue]>=21.9
 python-dotenv>=1.0.1
 fastapi>=0.115.5
 uvicorn[standard]>=0.34.0
