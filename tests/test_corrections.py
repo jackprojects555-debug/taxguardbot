@@ -52,21 +52,13 @@ def _make_transaction(**overrides) -> Transaction:
 # ---------------------------------------------------------------------------
 
 
-def test_show_last_no_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_last_no_transactions():
 
     reply = show_last(1)
     assert "אין" in reply
 
 
-def test_show_last_returns_transaction_details(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_last_returns_transaction_details():
 
     add_transaction(1, _make_transaction(amount=11700.0))
     reply = show_last(1)
@@ -74,11 +66,7 @@ def test_show_last_returns_transaction_details(tmp_path, monkeypatch):
     assert "#1" in reply
 
 
-def test_show_last_skips_canceled(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_last_skips_canceled():
 
     add_transaction(1, _make_transaction(amount=5000.0))
     add_transaction(1, _make_transaction(amount=9000.0, status="canceled"))
@@ -88,11 +76,7 @@ def test_show_last_skips_canceled(tmp_path, monkeypatch):
     assert "9,000" not in reply
 
 
-def test_show_last_all_canceled_returns_no_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_last_all_canceled_returns_no_transactions():
 
     add_transaction(1, _make_transaction(status="canceled"))
     reply = show_last(1)
@@ -104,11 +88,7 @@ def test_show_last_all_canceled_returns_no_transactions(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_show_list_no_transactions_this_month(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_list_no_transactions_this_month():
 
     # Transaction from a past month
     add_transaction(1, _make_transaction(month="2020-01"))
@@ -116,11 +96,7 @@ def test_show_list_no_transactions_this_month(tmp_path, monkeypatch):
     assert "אין" in reply
 
 
-def test_show_list_shows_current_month(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_list_shows_current_month():
 
     add_transaction(1, _make_transaction(amount=11700.0))
     reply = show_list(1)
@@ -128,11 +104,7 @@ def test_show_list_shows_current_month(tmp_path, monkeypatch):
     assert "#1" in reply
 
 
-def test_show_list_excludes_other_months(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_list_excludes_other_months():
 
     add_transaction(1, _make_transaction(amount=5000.0, month="2020-01"))
     add_transaction(1, _make_transaction(amount=9000.0))  # current month
@@ -142,11 +114,7 @@ def test_show_list_excludes_other_months(tmp_path, monkeypatch):
     assert "5,000" not in reply
 
 
-def test_show_list_caps_at_five(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_list_caps_at_five():
 
     for i in range(7):
         add_transaction(1, _make_transaction(amount=float(1000 + i * 100)))
@@ -158,11 +126,7 @@ def test_show_list_caps_at_five(tmp_path, monkeypatch):
     assert "#7" in reply
 
 
-def test_show_list_most_recent_first(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_show_list_most_recent_first():
 
     add_transaction(1, _make_transaction(amount=1000.0))
     add_transaction(1, _make_transaction(amount=2000.0))
@@ -176,11 +140,7 @@ def test_show_list_most_recent_first(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_cancel_by_id_marks_canceled(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_by_id_marks_canceled():
 
     add_transaction(1, _make_transaction())
     cancel_by_id(1, 1)
@@ -188,11 +148,7 @@ def test_cancel_by_id_marks_canceled(tmp_path, monkeypatch):
     assert get_transaction_by_id(1, 1).status == "canceled"
 
 
-def test_cancel_by_id_sets_canceled_at(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_by_id_sets_canceled_at():
 
     add_transaction(1, _make_transaction())
     cancel_by_id(1, 1)
@@ -200,21 +156,13 @@ def test_cancel_by_id_sets_canceled_at(tmp_path, monkeypatch):
     assert get_transaction_by_id(1, 1).canceled_at is not None
 
 
-def test_cancel_by_id_not_found(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_by_id_not_found():
 
     reply = cancel_by_id(1, 99)
     assert "לא נמצאה" in reply
 
 
-def test_cancel_by_id_already_canceled(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_by_id_already_canceled():
 
     add_transaction(1, _make_transaction(status="canceled"))
     reply = cancel_by_id(1, 1)
@@ -226,11 +174,7 @@ def test_cancel_by_id_already_canceled(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_cancel_last_targets_most_recent_non_canceled(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_last_targets_most_recent_non_canceled():
 
     add_transaction(1, _make_transaction(amount=1000.0))
     add_transaction(1, _make_transaction(amount=2000.0))
@@ -241,11 +185,7 @@ def test_cancel_last_targets_most_recent_non_canceled(tmp_path, monkeypatch):
     assert get_transaction_by_id(1, 2).status == "canceled"
 
 
-def test_cancel_last_no_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_cancel_last_no_transactions():
 
     reply = cancel_last(1)
     assert "אין" in reply
@@ -256,11 +196,7 @@ def test_cancel_last_no_transactions(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_correct_by_id_recalculates_amounts(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_recalculates_amounts():
 
     add_transaction(1, _make_transaction(amount=11700.0))
     correct_by_id(1, 1, "23400", TEST_USER)
@@ -271,11 +207,7 @@ def test_correct_by_id_recalculates_amounts(tmp_path, monkeypatch):
     assert t.total_to_save > 0
 
 
-def test_correct_by_id_resets_saved_amount(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_resets_saved_amount():
 
     add_transaction(1, _make_transaction(saved_amount=3000.0, status="partially_saved"))
     correct_by_id(1, 1, "11700", TEST_USER)
@@ -285,11 +217,7 @@ def test_correct_by_id_resets_saved_amount(tmp_path, monkeypatch):
     assert t.status == "open"
 
 
-def test_correct_by_id_remaining_equals_new_total_to_save(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_remaining_equals_new_total_to_save():
 
     add_transaction(1, _make_transaction())
     correct_by_id(1, 1, "11700", TEST_USER)
@@ -298,32 +226,20 @@ def test_correct_by_id_remaining_equals_new_total_to_save(tmp_path, monkeypatch)
     assert t.remaining_amount == pytest.approx(t.total_to_save)
 
 
-def test_correct_by_id_not_found(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_not_found():
 
     reply = correct_by_id(1, 99, "5000", TEST_USER)
     assert "לא נמצאה" in reply
 
 
-def test_correct_by_id_canceled_transaction(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_canceled_transaction():
 
     add_transaction(1, _make_transaction(status="canceled"))
     reply = correct_by_id(1, 1, "5000", TEST_USER)
     assert "מבוטלת" in reply
 
 
-def test_correct_by_id_invalid_amount(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_invalid_amount():
 
     add_transaction(1, _make_transaction())
     reply = correct_by_id(1, 1, "abc", TEST_USER)
@@ -333,11 +249,7 @@ def test_correct_by_id_invalid_amount(tmp_path, monkeypatch):
     assert get_transaction_by_id(1, 1).amount == pytest.approx(11700.0)
 
 
-def test_correct_by_id_uses_user_rates(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_by_id_uses_user_rates():
 
     add_transaction(1, _make_transaction(vat_included=False))
 
@@ -360,11 +272,7 @@ def test_correct_by_id_uses_user_rates(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_correct_last_targets_most_recent_non_canceled(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_last_targets_most_recent_non_canceled():
 
     add_transaction(1, _make_transaction(amount=5000.0))
     add_transaction(1, _make_transaction(amount=9000.0))
@@ -375,11 +283,7 @@ def test_correct_last_targets_most_recent_non_canceled(tmp_path, monkeypatch):
     assert get_transaction_by_id(1, 2).amount == pytest.approx(20000.0)
 
 
-def test_correct_last_no_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_correct_last_no_transactions():
 
     reply = correct_last(1, "5000", TEST_USER)
     assert "אין" in reply

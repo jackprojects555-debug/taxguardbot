@@ -72,11 +72,7 @@ def test_parse_amount_empty_returns_none():
 # ---------------------------------------------------------------------------
 
 
-def test_full_transfer_marks_fully_saved(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_full_transfer_marks_fully_saved():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "")
@@ -87,11 +83,7 @@ def test_full_transfer_marks_fully_saved(tmp_path, monkeypatch):
     assert t.remaining_amount == pytest.approx(0.0)
 
 
-def test_full_transfer_returns_success_message(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_full_transfer_returns_success_message():
 
     add_transaction(1, _make_transaction())
     reply = process_transfer(1, "")
@@ -99,11 +91,7 @@ def test_full_transfer_returns_success_message(tmp_path, monkeypatch):
     assert "נסגרה" in reply
 
 
-def test_full_transfer_sets_updated_at(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_full_transfer_sets_updated_at():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "")
@@ -117,11 +105,7 @@ def test_full_transfer_sets_updated_at(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_partial_transfer_updates_saved_and_remaining(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_partial_transfer_updates_saved_and_remaining():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "2000")
@@ -132,11 +116,7 @@ def test_partial_transfer_updates_saved_and_remaining(tmp_path, monkeypatch):
     assert t.remaining_amount == pytest.approx(3000.0)
 
 
-def test_partial_transfer_returns_partial_message(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_partial_transfer_returns_partial_message():
 
     add_transaction(1, _make_transaction())
     reply = process_transfer(1, "2000")
@@ -144,11 +124,7 @@ def test_partial_transfer_returns_partial_message(tmp_path, monkeypatch):
     assert "3,000" in reply
 
 
-def test_partial_transfer_accumulates_on_second_call(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_partial_transfer_accumulates_on_second_call():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "2000")
@@ -160,11 +136,7 @@ def test_partial_transfer_accumulates_on_second_call(tmp_path, monkeypatch):
     assert t.status == "partially_saved"
 
 
-def test_second_transfer_completes_transaction(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_second_transfer_completes_transaction():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "3000")
@@ -180,11 +152,7 @@ def test_second_transfer_completes_transaction(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_amount_exceeding_remaining_is_capped(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_amount_exceeding_remaining_is_capped():
 
     add_transaction(1, _make_transaction())
     process_transfer(1, "9999")
@@ -195,11 +163,7 @@ def test_amount_exceeding_remaining_is_capped(tmp_path, monkeypatch):
     assert t.remaining_amount == pytest.approx(0.0)
 
 
-def test_capped_transfer_reports_actual_amount(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_capped_transfer_reports_actual_amount():
 
     add_transaction(1, _make_transaction())
     reply = process_transfer(1, "9999")
@@ -212,11 +176,7 @@ def test_capped_transfer_reports_actual_amount(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_targets_most_recent_open(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_targets_most_recent_open():
 
     add_transaction(
         1, _make_transaction(amount=1000.0, total_to_save=200.0, remaining_amount=200.0)
@@ -233,11 +193,7 @@ def test_targets_most_recent_open(tmp_path, monkeypatch):
     assert t2.status == "fully_saved"
 
 
-def test_skips_fully_saved_transactions(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_skips_fully_saved_transactions():
 
     add_transaction(1, _make_transaction(total_to_save=5000.0, remaining_amount=5000.0))
     add_transaction(1, _make_transaction(total_to_save=3000.0, remaining_amount=3000.0))
@@ -256,21 +212,13 @@ def test_skips_fully_saved_transactions(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_no_open_transactions_returns_message(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_no_open_transactions_returns_message():
 
     reply = process_transfer(1, "")
     assert "אין" in reply
 
 
-def test_invalid_amount_returns_message(tmp_path, monkeypatch):
-    import app.storage as st
-
-    monkeypatch.setattr(st, "DATA_FILE", tmp_path / "t.json")
-    monkeypatch.setattr(st, "USER_TRANSACTIONS", {})
+def test_invalid_amount_returns_message():
 
     add_transaction(1, _make_transaction())
     reply = process_transfer(1, "abc")

@@ -136,11 +136,7 @@ def test_parse_yes_no_unknown_returns_none():
 # ---------------------------------------------------------------------------
 
 
-def test_onboarding_full_vat_registered_flow(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_onboarding_full_vat_registered_flow():
 
     upsert_from_telegram(telegram_user_id=1)
     reply = start_onboarding(1)
@@ -180,11 +176,7 @@ def test_onboarding_full_vat_registered_flow(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_onboarding_full_vat_exempt_flow(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_onboarding_full_vat_exempt_flow():
 
     upsert_from_telegram(telegram_user_id=2)
     start_onboarding(2)
@@ -214,11 +206,7 @@ def test_onboarding_full_vat_exempt_flow(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_invalid_business_type_stays_on_same_step(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_invalid_business_type_stays_on_same_step():
 
     upsert_from_telegram(telegram_user_id=3)
     start_onboarding(3)
@@ -228,11 +216,7 @@ def test_invalid_business_type_stays_on_same_step(tmp_path, monkeypatch):
     assert get_user(3).onboarding_step == STEP_BUSINESS_TYPE
 
 
-def test_invalid_rate_stays_on_same_step(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_invalid_rate_stays_on_same_step():
 
     upsert_from_telegram(telegram_user_id=4)
     start_onboarding(4)
@@ -246,11 +230,7 @@ def test_invalid_rate_stays_on_same_step(tmp_path, monkeypatch):
     assert get_user(4).onboarding_step == STEP_INCOME_TAX
 
 
-def test_invalid_yes_no_stays_on_same_step(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_invalid_yes_no_stays_on_same_step():
 
     upsert_from_telegram(telegram_user_id=5)
     start_onboarding(5)
@@ -268,11 +248,7 @@ def test_invalid_yes_no_stays_on_same_step(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def test_decimal_rate_accepted_in_flow(tmp_path, monkeypatch):
-    import app.user_storage as us
-
-    monkeypatch.setattr(us, "USERS_FILE", tmp_path / "users.json")
-    monkeypatch.setattr(us, "USERS", {})
+def test_decimal_rate_accepted_in_flow():
 
     upsert_from_telegram(telegram_user_id=6)
     start_onboarding(6)
