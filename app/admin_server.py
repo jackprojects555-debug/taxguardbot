@@ -22,6 +22,7 @@ from app.user_storage import (
     delete_user_record,
     get_user,
     list_registered_users,
+    update_user_profile,
     user_summary_dict,
 )
 
@@ -105,6 +106,20 @@ class UserCreateBody(BaseModel):
     display_name: Optional[str] = None
     notes: str = ""
     is_blocked: bool = False
+    business_type: str = "vat_registered"
+    vat_included_default: bool = True
+    income_tax_rate: float = Field(0.20, ge=0.0, le=1.0)
+    national_insurance_rate: float = Field(0.08, ge=0.0, le=1.0)
+    social_savings_rate: float = Field(0.05, ge=0.0, le=1.0)
+    onboarding_completed: bool = False
+    profile_notified: bool = False
+
+    @field_validator("business_type")
+    @classmethod
+    def validate_business_type(cls, v: str) -> str:
+        if v not in ("vat_registered", "vat_exempt"):
+            raise ValueError("business_type must be 'vat_registered' or 'vat_exempt'")
+        return v
 
 
 class UserUpdateBody(BaseModel):
@@ -112,32 +127,71 @@ class UserUpdateBody(BaseModel):
     display_name: Optional[str] = None
     notes: Optional[str] = None
     is_blocked: Optional[bool] = None
+    business_type: Optional[str] = None
+    vat_included_default: Optional[bool] = None
+    income_tax_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
+    national_insurance_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
+    social_savings_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
+    onboarding_completed: Optional[bool] = None
+    profile_notified: Optional[bool] = None
+
+    @field_validator("business_type")
+    @classmethod
+    def validate_business_type(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and v not in ("vat_registered", "vat_exempt"):
+            raise ValueError("business_type must be 'vat_registered' or 'vat_exempt'")
+        return v
 
 
 @app.post("/api/admin/users", dependencies=[Depends(verify_admin)])
 async def admin_create_or_replace_user(body: UserCreateBody) -> dict:
-    u = create_or_update_admin(
+    create_or_update_admin(
         telegram_user_id=body.telegram_user_id,
         username=body.username,
         display_name=body.display_name,
         notes=body.notes,
         is_blocked=body.is_blocked,
     )
-    return user_summary_dict(u)
+    update_user_profile(
+        body.telegram_user_id,
+        business_type=body.business_type,
+        vat_included_default=body.vat_included_default,
+        income_tax_rate=body.income_tax_rate,
+        national_insurance_rate=body.national_insurance_rate,
+        social_savings_rate=body.social_savings_rate,
+        onboarding_completed=body.onboarding_completed,
+        profile_notified=body.profile_notified,
+    )
+    return user_summary_dict(get_user(body.telegram_user_id))
 
 
 @app.patch("/api/admin/users/{telegram_user_id}", dependencies=[Depends(verify_admin)])
 async def admin_patch_user(telegram_user_id: int, body: UserUpdateBody) -> dict:
     if get_user(telegram_user_id) is None:
         raise HTTPException(status_code=404, detail="User not found")
-    u = create_or_update_admin(
+    create_or_update_admin(
         telegram_user_id=telegram_user_id,
         username=body.username,
         display_name=body.display_name,
         notes=body.notes,
         is_blocked=body.is_blocked,
     )
-    return user_summary_dict(u)
+    profile_updates = {
+        k: v
+        for k, v in {
+            "business_type": body.business_type,
+            "vat_included_default": body.vat_included_default,
+            "income_tax_rate": body.income_tax_rate,
+            "national_insurance_rate": body.national_insurance_rate,
+            "social_savings_rate": body.social_savings_rate,
+            "onboarding_completed": body.onboarding_completed,
+            "profile_notified": body.profile_notified,
+        }.items()
+        if v is not None
+    }
+    if profile_updates:
+        update_user_profile(telegram_user_id, **profile_updates)
+    return user_summary_dict(get_user(telegram_user_id))
 
 
 @app.delete("/api/admin/users/{telegram_user_id}", dependencies=[Depends(verify_admin)])
