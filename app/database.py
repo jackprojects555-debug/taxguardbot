@@ -41,8 +41,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     saved_amount REAL NOT NULL DEFAULT 0.0,
     updated_at TEXT,
     canceled_at TEXT,
-    PRIMARY KEY (user_id, id),
-    FOREIGN KEY (user_id) REFERENCES users(telegram_user_id)
+    PRIMARY KEY (user_id, id)
 );
 """
 
@@ -52,7 +51,7 @@ def get_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(str(_DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("PRAGMA foreign_keys=OFF")
     return conn
 
 
