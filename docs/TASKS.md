@@ -6,16 +6,20 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-003] Transfer confirmation commands
+### [PROD-004] Correction commands
 Status: In review
-Branch: feature/prod-003-transfer-commands
-PR: #8
-Scope: process_transfer logic, העברתי / העברתי {amount} bot commands
-Commits: A (transfers module + tests), B (bot wiring)
+Branch: feature/prod-004-correction-commands
+PR: #10
+Scope: show_last, show_list, cancel, correct — bot commands + tests
+Commits: A (corrections module + tests), B (bot wiring)
 
 ---
 
 ## Done
+
+### [PROD-003] Transfer confirmation commands
+Status: Complete
+Merged: feature/prod-003-transfer-commands → main (PR #8)
 
 ### [PROD-002] Transaction status tracking
 Status: Complete
@@ -37,13 +41,8 @@ Merged: feature/engineering-migration → main
 
 ## Backlog — Product
 
-### [PROD-003] Transfer confirmation commands
-Status: In review — see In Progress section above
-
 ### [PROD-004] Correction commands
-Status: Not started
-Spec: MASTER_SPEC_V1.md section 11
-Notes: `תקן אחרון`, `בטל אחרון`, `תקן {id}`, `בטל {id}`
+Status: In review — see In Progress section above
 
 ### [PROD-005] Automated reminders
 Status: Not started
