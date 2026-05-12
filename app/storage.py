@@ -96,4 +96,13 @@ def clear_transactions(user_id: int):
     _save_to_file()
 
 
+def list_user_ids_with_transactions() -> List[int]:
+    return sorted(USER_TRANSACTIONS.keys())
+
+
+def delete_all_transactions(user_id: int) -> None:
+    """Remove stored transactions for user (empty bucket). Same persistence as reset."""
+    clear_transactions(user_id)
+
+
 _load_from_file()
