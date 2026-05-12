@@ -7,8 +7,9 @@ Active and backlog tasks. Update status when work starts or completes.
 ## In Progress
 
 ### [PROD-002] Transaction status tracking
-Status: In progress
+Status: In review
 Branch: feature/prod-002-transaction-status
+PR: #7
 Scope: Transaction model fields, storage layer, מצב gap reporting, admin API
 Commits: A (model + storage + tests), B (bot + admin API)
 
