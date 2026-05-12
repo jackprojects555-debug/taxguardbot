@@ -6,35 +6,28 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [ENG-001] Engineering migration — Phase 1: Documentation
-Status: In progress
-Branch: feature/engineering-migration
-Scope: .env.example, PROJECT_SETUP.md, CLAUDE.md, .cursor/rules/, DECISIONS.md,
-       PROJECT_STATE.md, TASKS.md, DEPLOYMENT.md
+### [PROD-001] Per-user onboarding and tax rate configuration
+Status: In review
+Branch: feature/prod-001-onboarding
+PR: #6
+Scope: BotUser model fields, onboarding state machine, bot routing, admin API exposure
+Commits: A (model), B (wire rates), C (onboarding flow + tests), D (admin API)
 
 ---
 
-## Backlog — Engineering
+## Done
+
+### [ENG-001] Engineering migration — Phase 1: Documentation
+Status: Complete
+Merged: feature/engineering-migration → main
 
 ### [ENG-002] Engineering migration — Phase 2: Tooling
-Status: Not started
-Scope:
-- pyproject.toml (tooling config only — ruff, pytest settings)
-- Makefile (setup, test, lint, format, check targets)
-- .pre-commit-config.yaml (ruff hook)
-- tests/test_calculations.py (unit tests for calculations.py)
-- .github/workflows/tests.yml (CI pipeline, Python 3.12)
-Prerequisite: ENG-001 merged
+Status: Complete
+Merged: feature/engineering-migration → main
 
 ---
 
 ## Backlog — Product
-
-### [PROD-001] Per-user onboarding and tax rate configuration
-Status: Not started
-Spec: MASTER_SPEC_V1.md sections 9, 10
-Notes: Requires per-user fields on BotUser model. Tax rates currently hardcoded.
-Prerequisite: ENG-002 complete (tests must exist before logic changes)
 
 ### [PROD-002] Transaction status tracking
 Status: Not started

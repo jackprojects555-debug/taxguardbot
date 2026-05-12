@@ -46,6 +46,19 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
         "פעולה מומלצת: העבר עכשיו ₪{total_to_save:,.0f} לחשבון השמירה שלך."
     ),
     "invalid_number_en": "Invalid input. Please enter a number.",
+    # Onboarding
+    "profile_notified_he": "הפרופיל שלך הוגדר בברירות מחדל. לשינוי הגדרות שלח: הגדרות",
+    "onboarding_welcome_he": (
+        "ברוך הבא! נגדיר את הפרופיל שלך.\n\nאיזה סוג עסק יש לך?\n1 — עוסק מורשה\n2 — עוסק פטור"
+    ),
+    "onboarding_ask_vat_included_he": 'האם המחירים שלך כוללים מע"מ?\nכן / לא',
+    "onboarding_ask_income_tax_he": "מה שיעור מס ההכנסה שלך? (לדוגמה: 20 או 0.20)",
+    "onboarding_ask_national_insurance_he": "מה שיעור ביטוח לאומי שלך? (לדוגמה: 8 או 0.08)",
+    "onboarding_ask_social_savings_he": "מה שיעור הסוציאליות שלך? (לדוגמה: 5 או 0.05)",
+    "onboarding_complete_he": ("ההגדרות נשמרו. הבוט מוכן לשימוש!\nשלח סכום כדי לחשב את ההפרשות."),
+    "onboarding_invalid_business_type_he": "לא הבנתי. שלח 1 לעוסק מורשה או 2 לעוסק פטור.",
+    "onboarding_invalid_yes_no_he": "לא הבנתי. שלח כן או לא.",
+    "onboarding_invalid_rate_he": "לא הבנתי. שלח מספר, למשל: 20 או 0.20",
 }
 
 _MESSAGES: Dict[str, str] = deepcopy(_DEFAULT_MESSAGES)

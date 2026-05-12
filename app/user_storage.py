@@ -12,6 +12,17 @@ class BotUser:
     display_name: Optional[str] = None
     notes: str = ""
     is_blocked: bool = False
+    # Onboarding state
+    onboarding_completed: bool = False
+    onboarding_step: Optional[str] = None  # None when complete
+    profile_notified: bool = False  # one-time defaults notification sent
+    # Tax profile
+    business_type: str = "vat_registered"  # "vat_registered" | "vat_exempt"
+    vat_included_default: bool = True
+    income_tax_rate: float = 0.20
+    national_insurance_rate: float = 0.08
+    social_savings_rate: float = 0.05
+    # Timestamps
     created_at: datetime = None
     updated_at: datetime = None
 
@@ -34,18 +45,37 @@ def _user_to_dict(user: BotUser) -> dict:
         "display_name": user.display_name,
         "notes": user.notes,
         "is_blocked": user.is_blocked,
+        "onboarding_completed": user.onboarding_completed,
+        "onboarding_step": user.onboarding_step,
+        "profile_notified": user.profile_notified,
+        "business_type": user.business_type,
+        "vat_included_default": user.vat_included_default,
+        "income_tax_rate": user.income_tax_rate,
+        "national_insurance_rate": user.national_insurance_rate,
+        "social_savings_rate": user.social_savings_rate,
         "created_at": user.created_at.isoformat(),
         "updated_at": user.updated_at.isoformat(),
     }
 
 
 def _dict_to_user(raw: dict) -> BotUser:
+    # onboarding_completed defaults True for records written before PROD-001
+    # so existing users are not re-onboarded after upgrade.
+    # profile_notified defaults False so they receive the one-time notification.
     return BotUser(
         telegram_user_id=int(raw["telegram_user_id"]),
         username=raw.get("username"),
         display_name=raw.get("display_name"),
         notes=raw.get("notes") or "",
         is_blocked=bool(raw.get("is_blocked", False)),
+        onboarding_completed=bool(raw.get("onboarding_completed", True)),
+        onboarding_step=raw.get("onboarding_step"),
+        profile_notified=bool(raw.get("profile_notified", False)),
+        business_type=raw.get("business_type", "vat_registered"),
+        vat_included_default=bool(raw.get("vat_included_default", True)),
+        income_tax_rate=float(raw.get("income_tax_rate", 0.20)),
+        national_insurance_rate=float(raw.get("national_insurance_rate", 0.08)),
+        social_savings_rate=float(raw.get("social_savings_rate", 0.05)),
         created_at=datetime.fromisoformat(raw["created_at"]),
         updated_at=datetime.fromisoformat(raw["updated_at"]),
     )
@@ -111,6 +141,31 @@ def upsert_from_telegram(
         updated_at=now,
     )
     USERS[telegram_user_id] = user
+    _save_users()
+    return user
+
+
+def update_user_profile(telegram_user_id: int, **kwargs) -> Optional["BotUser"]:
+    """Update any mutable profile fields on an existing user and persist."""
+    user = USERS.get(telegram_user_id)
+    if user is None:
+        return None
+    allowed = {
+        "business_type",
+        "vat_included_default",
+        "income_tax_rate",
+        "national_insurance_rate",
+        "social_savings_rate",
+        "onboarding_completed",
+        "onboarding_step",
+        "profile_notified",
+        "notes",
+        "is_blocked",
+    }
+    for field, value in kwargs.items():
+        if field in allowed:
+            setattr(user, field, value)
+    user.updated_at = datetime.now()
     _save_users()
     return user
 
