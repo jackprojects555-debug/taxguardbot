@@ -50,7 +50,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(format_message("profile_notified_he"))
 
     if text == "העברתי" or text.startswith("העברתי "):
-        amount_text = text[len("העברתי"):].strip()
+        amount_text = text[len("העברתי") :].strip()
         await update.message.reply_text(process_transfer(user_id, amount_text))
         return
 

@@ -229,7 +229,7 @@ def test_targets_most_recent_open(tmp_path, monkeypatch):
 
     t1 = get_transaction_by_id(1, 1)
     t2 = get_transaction_by_id(1, 2)
-    assert t1.status == "open"      # untouched
+    assert t1.status == "open"  # untouched
     assert t2.status == "fully_saved"
 
 

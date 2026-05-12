@@ -13,4 +13,7 @@ lint:
 format:
 	. .venv/bin/activate && ruff format .
 
-check: lint test
+check: lint format-check test
+
+format-check:
+	. .venv/bin/activate && ruff format --check .
