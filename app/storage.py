@@ -119,7 +119,21 @@ def update_transaction(user_id: int, transaction_id: int, **kwargs) -> Optional[
     t = get_transaction_by_id(user_id, transaction_id)
     if t is None:
         return None
-    allowed = {"status", "saved_amount", "remaining_amount", "updated_at", "canceled_at"}
+    allowed = {
+        "status",
+        "saved_amount",
+        "remaining_amount",
+        "updated_at",
+        "canceled_at",
+        "amount",
+        "vat_amount",
+        "base_amount",
+        "income_tax_amount",
+        "national_insurance_amount",
+        "social_savings_amount",
+        "total_to_save",
+        "available_amount",
+    }
     for field, value in kwargs.items():
         if field in allowed:
             setattr(t, field, value)
