@@ -87,6 +87,25 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     ),
     "list_header_he": "עסקאות החודש:",
     "transaction_list_row_he": "#{id} ₪{amount:,.0f} — {status}",
+    # Automated reports
+    "midmonth_report_he": (
+        "דוח אמצע חודש — {month}\n\n"
+        "הכנסות: ₪{total_income:,.0f}\n"
+        "לשמירה: ₪{total_to_save:,.0f}\n"
+        "הועבר: ₪{total_saved:,.0f}\n"
+        "פער פתוח: ₪{total_gap:,.0f}"
+    ),
+    "endmonth_report_he": (
+        "דוח סוף חודש — {month}\n\n"
+        "הכנסות: ₪{total_income:,.0f}\n\n"
+        "מע״מ: ₪{total_vat:,.0f}\n"
+        "מס הכנסה: ₪{total_income_tax:,.0f}\n"
+        "ביטוח לאומי: ₪{total_national_insurance:,.0f}\n"
+        "סוציאליות: ₪{total_social_savings:,.0f}\n\n"
+        "לשמירה: ₪{total_to_save:,.0f}\n"
+        "הועבר: ₪{total_saved:,.0f}\n"
+        "פער: ₪{total_gap:,.0f}"
+    ),
 }
 
 _MESSAGES: Dict[str, str] = deepcopy(_DEFAULT_MESSAGES)
