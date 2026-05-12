@@ -6,16 +6,19 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-004] Correction commands
+### [PROD-005] Automated reminders
 Status: In review
-Branch: feature/prod-004-correction-commands
-PR: #10
-Scope: show_last, show_list, cancel, correct — bot commands + tests
-Commits: A (corrections module + tests), B (bot wiring)
+Branch: feature/prod-005-reminders
+Scope: mid-month (15th) and end-of-month reports via PTB JobQueue
+Commits: A (report builders + message keys + tests), B (bot wiring)
 
 ---
 
 ## Done
+
+### [PROD-004] Correction commands
+Status: Complete
+Merged: feature/prod-004-correction-commands → main (PR #10)
 
 ### [PROD-003] Transfer confirmation commands
 Status: Complete
@@ -41,13 +44,8 @@ Merged: feature/engineering-migration → main
 
 ## Backlog — Product
 
-### [PROD-004] Correction commands
-Status: In review — see In Progress section above
-
 ### [PROD-005] Automated reminders
-Status: Not started
-Spec: MASTER_SPEC_V1.md sections 12.2, 12.3
-Notes: Mid-month (15th) and end-of-month reports. Requires scheduler.
+Status: In review — see In Progress section above
 
 ### [PROD-006] Database migration
 Status: Not started
