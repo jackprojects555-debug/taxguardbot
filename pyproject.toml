@@ -1,0 +1,14 @@
+[project]
+name = "taxguardbot"
+version = "1.1.0"
+description = "Telegram bot for freelancer tax cash-flow separation"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

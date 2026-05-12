@@ -24,6 +24,7 @@ Telegram bot that helps freelancers manage cash flow by separating tax obligatio
 
 ## Project Structure
 
+```
 app/
   __init__.py
   admin_server.py
@@ -36,8 +37,18 @@ app/
   storage.py
   user_storage.py
 docs/
+  CHANGELOG.md
+  DECISIONS.md
+  DEPLOYMENT.md
+  MASTER_SPEC_V1.md
+  PROJECT_STATE.md
+  TASKS.md
+  TEST_STRATEGY_V1.md
+  (+ working method and prompt docs)
+CLAUDE.md
 requirements.txt
 README.md
+```
 
 ## Setup
 
@@ -78,9 +89,9 @@ MVP working:
 - UX improvements
 - Stronger admin auth (OAuth, VPN, etc.)
 
-## Cursor Usage
+## AI Usage
 
-This project follows strict Cursor usage rules.
+**Cursor:** follows strict working method rules.
+See: `docs/CURSOR_WORKING_METHOD_V2.md`
 
-See:
-docs/CURSOR_WORKING_METHOD_V2.md
+**Claude Code:** governed by `CLAUDE.md` at the project root.
