@@ -6,15 +6,15 @@ Active and backlog tasks. Update status when work starts or completes.
 
 ## In Progress
 
-### [PROD-006] Database migration
-Status: In review
-Branch: feature/prod-006-database
-Scope: SQLite via stdlib sqlite3; storage.py + user_storage.py rewritten; migration script
-Commits: A (schema + test fixture), B (storage.py), C (user_storage.py), D (test cleanup), E (migration script)
+_(none)_
 
 ---
 
 ## Done
+
+### [PROD-006] Database migration
+Status: Complete
+Merged: feature/prod-006-database → main (PR #12)
 
 ### [PROD-005] Automated reminders
 Status: Complete
@@ -48,5 +48,3 @@ Merged: feature/engineering-migration → main
 
 ## Backlog — Product
 
-### [PROD-006] Database migration
-Status: In review — see In Progress section above
