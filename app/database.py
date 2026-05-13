@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     income_tax_rate DOUBLE PRECISION NOT NULL DEFAULT 0.20,
     national_insurance_rate DOUBLE PRECISION NOT NULL DEFAULT 0.08,
     social_savings_rate DOUBLE PRECISION NOT NULL DEFAULT 0.05,
+    preferred_language TEXT NOT NULL DEFAULT 'he',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -93,11 +94,25 @@ def get_connection() -> _Conn:
     return _Conn(conn, is_postgres=False)
 
 
+_MIGRATIONS = [
+    "ALTER TABLE users ADD COLUMN preferred_language TEXT NOT NULL DEFAULT 'he'",
+]
+
+
+def _apply_migrations(conn) -> None:
+    for stmt in _MIGRATIONS:
+        try:
+            conn.execute(stmt)
+        except Exception:
+            pass  # column already exists
+
+
 def init_db() -> None:
     statements = [s.strip() for s in _SCHEMA.split(";") if s.strip()]
     with get_connection() as conn:
         for stmt in statements:
             conn.execute(stmt)
+        _apply_migrations(conn)
 
 
 init_db()
