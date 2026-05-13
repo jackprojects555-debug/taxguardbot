@@ -14,7 +14,7 @@ from app.onboarding import (
     parse_yes_no,
     start_onboarding,
 )
-from app.user_storage import get_user, upsert_from_telegram
+from app.user_storage import get_user, update_user_profile, upsert_from_telegram
 
 # ---------------------------------------------------------------------------
 # parse_rate
@@ -258,3 +258,78 @@ def test_decimal_rate_accepted_in_flow():
     reply, done = handle_onboarding(get_user(6), "0.25")
     assert not done
     assert get_user(6).income_tax_rate == pytest.approx(0.25)
+
+
+# ---------------------------------------------------------------------------
+# parse_business_type — English aliases
+# ---------------------------------------------------------------------------
+
+
+def test_parse_business_type_english_registered():
+    assert parse_business_type("registered") == "vat_registered"
+    assert parse_business_type("vat registered") == "vat_registered"
+
+
+def test_parse_business_type_english_exempt():
+    assert parse_business_type("exempt") == "vat_exempt"
+    assert parse_business_type("vat exempt") == "vat_exempt"
+
+
+# ---------------------------------------------------------------------------
+# Onboarding flow — English language
+# ---------------------------------------------------------------------------
+
+
+def test_start_onboarding_english_welcome():
+    upsert_from_telegram(telegram_user_id=10)
+    reply = start_onboarding(10, lang="en")
+    assert "VAT" in reply
+    assert get_user(10).onboarding_step == STEP_BUSINESS_TYPE
+
+
+def test_onboarding_english_full_vat_registered_flow():
+    upsert_from_telegram(telegram_user_id=11)
+    update_user_profile(11, preferred_language="en")
+    start_onboarding(11, lang="en")
+
+    reply, done = handle_onboarding(get_user(11), "registered")
+    assert not done
+    assert get_user(11).business_type == "vat_registered"
+    assert get_user(11).onboarding_step == STEP_VAT_INCLUDED
+    assert "VAT" in reply
+
+    reply, done = handle_onboarding(get_user(11), "yes")
+    assert not done
+    assert get_user(11).vat_included_default is True
+
+    reply, done = handle_onboarding(get_user(11), "20")
+    assert not done
+    assert get_user(11).income_tax_rate == pytest.approx(0.20)
+
+    reply, done = handle_onboarding(get_user(11), "8")
+    assert not done
+
+    reply, done = handle_onboarding(get_user(11), "5")
+    assert done
+    assert get_user(11).onboarding_completed is True
+    assert "ready" in reply.lower()
+
+
+def test_onboarding_english_invalid_messages_are_english():
+    upsert_from_telegram(telegram_user_id=12)
+    update_user_profile(12, preferred_language="en")
+    start_onboarding(12, lang="en")
+
+    reply, done = handle_onboarding(get_user(12), "garbage")
+    assert not done
+    assert "understand" in reply.lower()
+
+
+def test_onboarding_hebrew_invalid_messages_are_hebrew():
+    upsert_from_telegram(telegram_user_id=13)
+    update_user_profile(13, preferred_language="he")
+    start_onboarding(13)
+
+    reply, done = handle_onboarding(get_user(13), "garbage")
+    assert not done
+    assert "הבנתי" in reply

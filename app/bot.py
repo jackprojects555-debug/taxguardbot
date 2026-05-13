@@ -28,6 +28,11 @@ _TZ = ZoneInfo("Asia/Jerusalem")
 _REPORT_TIME = time(9, 0, tzinfo=_TZ)
 
 
+def _detect_language(tg_user) -> str:
+    code = (tg_user.language_code or "").lower()
+    return "he" if code.startswith("he") or code == "iw" else "en"
+
+
 async def _end_of_month_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     today = datetime.now(_TZ)
     if (today + timedelta(days=1)).month != today.month:
@@ -60,7 +65,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user and not user.onboarding_completed:
         if user.onboarding_step is None:
-            reply = start_onboarding(user_id)
+            lang = _detect_language(tg_user)
+            update_user_profile(user_id, preferred_language=lang)
+            reply = start_onboarding(user_id, lang=lang)
         else:
             reply, _done = handle_onboarding(user, text)
         await update.message.reply_text(reply)

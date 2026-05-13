@@ -83,14 +83,32 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     "onboarding_welcome_he": (
         "ברוך הבא! נגדיר את הפרופיל שלך.\n\nאיזה סוג עסק יש לך?\n1 — עוסק מורשה\n2 — עוסק פטור"
     ),
+    "onboarding_welcome_en": (
+        "Welcome! Let's set up your profile.\n\nWhat type of business do you have?\n"
+        "1 — VAT registered\n2 — VAT exempt"
+    ),
     "onboarding_ask_vat_included_he": 'האם המחירים שלך כוללים מע"מ?\nכן / לא',
+    "onboarding_ask_vat_included_en": "Do your prices include VAT?\nyes / no",
     "onboarding_ask_income_tax_he": "מה שיעור מס ההכנסה שלך? (לדוגמה: 20 או 0.20)",
+    "onboarding_ask_income_tax_en": "What is your income tax rate? (e.g. 20 or 0.20)",
     "onboarding_ask_national_insurance_he": "מה שיעור ביטוח לאומי שלך? (לדוגמה: 8 או 0.08)",
+    "onboarding_ask_national_insurance_en": (
+        "What is your national insurance rate? (e.g. 8 or 0.08)"
+    ),
     "onboarding_ask_social_savings_he": "מה שיעור הסוציאליות שלך? (לדוגמה: 5 או 0.05)",
+    "onboarding_ask_social_savings_en": "What is your social savings rate? (e.g. 5 or 0.05)",
     "onboarding_complete_he": ("ההגדרות נשמרו. הבוט מוכן לשימוש!\nשלח סכום כדי לחשב את ההפרשות."),
+    "onboarding_complete_en": (
+        "Setup complete. The bot is ready!\nSend an income amount to calculate your allocations."
+    ),
     "onboarding_invalid_business_type_he": "לא הבנתי. שלח 1 לעוסק מורשה או 2 לעוסק פטור.",
+    "onboarding_invalid_business_type_en": (
+        "I didn't understand. Send 1 for VAT registered or 2 for VAT exempt."
+    ),
     "onboarding_invalid_yes_no_he": "לא הבנתי. שלח כן או לא.",
+    "onboarding_invalid_yes_no_en": "I didn't understand. Send yes or no.",
     "onboarding_invalid_rate_he": "לא הבנתי. שלח מספר, למשל: 20 או 0.20",
+    "onboarding_invalid_rate_en": "I didn't understand. Send a number, e.g. 20 or 0.20",
     # Transfer confirmation
     "transfer_full_success_he": "הועברו ₪{amount:,.0f} — עסקה נסגרה.",
     "transfer_partial_success_he": "הועברו ₪{saved:,.0f}. נשאר להעברה: ₪{remaining:,.0f}",
