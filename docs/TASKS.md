@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-007] NI / social savings fixed-monthly mode
+Status: Complete
+Merged: feature/v2-007-fixed-monthly-mode → main (PR #20)
+
 ### [V2-006] Pension allocation field
 Status: Complete
 Merged: feature/v2-006-pension-rate → main (PR #19)
