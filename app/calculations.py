@@ -7,6 +7,7 @@ def calculate_income_split(
     income_tax_rate: float = 0.20,
     national_insurance_rate: float = 0.08,
     social_savings_rate: float = 0.05,
+    pension_rate: float = 0.0,
 ) -> dict:
     if amount <= 0:
         raise ValueError("Amount must be greater than zero")
@@ -21,9 +22,14 @@ def calculate_income_split(
     income_tax_amount = base_amount * income_tax_rate
     national_insurance_amount = base_amount * national_insurance_rate
     social_savings_amount = base_amount * social_savings_rate
+    pension_amount = base_amount * pension_rate
 
     total_to_save = (
-        vat_amount + income_tax_amount + national_insurance_amount + social_savings_amount
+        vat_amount
+        + income_tax_amount
+        + national_insurance_amount
+        + social_savings_amount
+        + pension_amount
     )
 
     available_amount = amount - total_to_save
@@ -35,6 +41,7 @@ def calculate_income_split(
         "income_tax_amount": income_tax_amount,
         "national_insurance_amount": national_insurance_amount,
         "social_savings_amount": social_savings_amount,
+        "pension_amount": pension_amount,
         "total_to_save": total_to_save,
         "available_amount": available_amount,
     }

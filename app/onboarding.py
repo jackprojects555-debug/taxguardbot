@@ -9,6 +9,7 @@ STEP_VAT_INCLUDED = "vat_included"
 STEP_INCOME_TAX = "income_tax_rate"
 STEP_NATIONAL_INSURANCE = "national_insurance_rate"
 STEP_SOCIAL_SAVINGS = "social_savings_rate"
+STEP_PENSION = "pension_rate"
 
 
 def parse_rate(text: str) -> Optional[float]:
@@ -112,6 +113,17 @@ def handle_onboarding(user: BotUser, text: str) -> Tuple[str, bool]:
         update_user_profile(
             user.telegram_user_id,
             social_savings_rate=rate,
+            onboarding_step=STEP_PENSION,
+        )
+        return format_message(f"onboarding_ask_pension_{lang}"), False
+
+    if step == STEP_PENSION:
+        rate = parse_rate(text)
+        if rate is None:
+            return format_message(f"onboarding_invalid_rate_{lang}"), False
+        update_user_profile(
+            user.telegram_user_id,
+            pension_rate=rate,
             onboarding_step=None,
             onboarding_completed=True,
         )

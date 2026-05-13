@@ -6,6 +6,7 @@ from app.onboarding import (
     STEP_BUSINESS_TYPE,
     STEP_INCOME_TAX,
     STEP_NATIONAL_INSURANCE,
+    STEP_PENSION,
     STEP_SOCIAL_SAVINGS,
     STEP_VAT_INCLUDED,
     handle_onboarding,
@@ -165,8 +166,13 @@ def test_onboarding_full_vat_registered_flow():
     assert get_user(1).onboarding_step == STEP_SOCIAL_SAVINGS
 
     reply, done = handle_onboarding(get_user(1), "5")
-    assert done
+    assert not done
     assert get_user(1).social_savings_rate == pytest.approx(0.05)
+    assert get_user(1).onboarding_step == STEP_PENSION
+
+    reply, done = handle_onboarding(get_user(1), "6")
+    assert done
+    assert get_user(1).pension_rate == pytest.approx(0.06)
     assert get_user(1).onboarding_completed is True
     assert get_user(1).onboarding_step is None
 
@@ -196,8 +202,13 @@ def test_onboarding_full_vat_exempt_flow():
     assert get_user(2).national_insurance_rate == pytest.approx(0.12)
 
     reply, done = handle_onboarding(get_user(2), "0")
-    assert done
+    assert not done
     assert get_user(2).social_savings_rate == pytest.approx(0.0)
+    assert get_user(2).onboarding_step == STEP_PENSION
+
+    reply, done = handle_onboarding(get_user(2), "0")
+    assert done
+    assert get_user(2).pension_rate == pytest.approx(0.0)
     assert get_user(2).onboarding_completed is True
 
 
@@ -310,6 +321,10 @@ def test_onboarding_english_full_vat_registered_flow():
     assert not done
 
     reply, done = handle_onboarding(get_user(11), "5")
+    assert not done
+    assert get_user(11).onboarding_step == STEP_PENSION
+
+    reply, done = handle_onboarding(get_user(11), "0")
     assert done
     assert get_user(11).onboarding_completed is True
     assert "ready" in reply.lower()
@@ -333,3 +348,55 @@ def test_onboarding_hebrew_invalid_messages_are_hebrew():
     reply, done = handle_onboarding(get_user(13), "garbage")
     assert not done
     assert "הבנתי" in reply
+
+
+# ---------------------------------------------------------------------------
+# Pension step
+# ---------------------------------------------------------------------------
+
+
+def _reach_pension_step(user_id: int, lang: str = "he") -> None:
+    """Drive onboarding up to (but not including) the pension step."""
+    upsert_from_telegram(telegram_user_id=user_id)
+    update_user_profile(user_id, preferred_language=lang)
+    start_onboarding(user_id, lang=lang)
+    handle_onboarding(get_user(user_id), "1")  # vat_registered
+    handle_onboarding(get_user(user_id), "yes" if lang == "en" else "כן")  # vat_included
+    handle_onboarding(get_user(user_id), "20")  # income_tax
+    handle_onboarding(get_user(user_id), "8")  # national_insurance
+    handle_onboarding(get_user(user_id), "5")  # social_savings → now at STEP_PENSION
+
+
+def test_pension_step_is_reached_after_social_savings():
+    _reach_pension_step(20)
+    assert get_user(20).onboarding_step == STEP_PENSION
+
+
+def test_pension_step_zero_skips_and_completes():
+    _reach_pension_step(21)
+    reply, done = handle_onboarding(get_user(21), "0")
+    assert done
+    assert get_user(21).pension_rate == pytest.approx(0.0)
+    assert get_user(21).onboarding_completed is True
+
+
+def test_pension_step_saves_nonzero_rate():
+    _reach_pension_step(22)
+    reply, done = handle_onboarding(get_user(22), "6")
+    assert done
+    assert get_user(22).pension_rate == pytest.approx(0.06)
+    assert get_user(22).onboarding_completed is True
+
+
+def test_pension_step_invalid_input_stays():
+    _reach_pension_step(23)
+    reply, done = handle_onboarding(get_user(23), "abc")
+    assert not done
+    assert get_user(23).onboarding_step == STEP_PENSION
+
+
+def test_pension_step_english_prompt_contains_pension():
+    _reach_pension_step(24, lang="en")
+    # The reply from social_savings step should mention pension
+    user = get_user(24)
+    assert user.onboarding_step == STEP_PENSION

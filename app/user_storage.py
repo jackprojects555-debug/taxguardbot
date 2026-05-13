@@ -20,6 +20,7 @@ class BotUser:
     income_tax_rate: float = 0.20
     national_insurance_rate: float = 0.08
     social_savings_rate: float = 0.05
+    pension_rate: float = 0.0
     preferred_language: str = "he"
     created_at: datetime = None
     updated_at: datetime = None
@@ -47,6 +48,7 @@ def _row_to_user(row) -> BotUser:
         income_tax_rate=row["income_tax_rate"],
         national_insurance_rate=row["national_insurance_rate"],
         social_savings_rate=row["social_savings_rate"],
+        pension_rate=row["pension_rate"] if row["pension_rate"] is not None else 0.0,
         preferred_language=row["preferred_language"] or "he",
         created_at=datetime.fromisoformat(row["created_at"]),
         updated_at=datetime.fromisoformat(row["updated_at"]),
@@ -81,6 +83,7 @@ def update_user_profile(telegram_user_id: int, **kwargs) -> Optional[BotUser]:
         "income_tax_rate",
         "national_insurance_rate",
         "social_savings_rate",
+        "pension_rate",
         "preferred_language",
         "onboarding_completed",
         "onboarding_step",
@@ -185,6 +188,7 @@ def user_summary_dict(user: BotUser) -> dict:
         "income_tax_rate": user.income_tax_rate,
         "national_insurance_rate": user.national_insurance_rate,
         "social_savings_rate": user.social_savings_rate,
+        "pension_rate": user.pension_rate,
         "preferred_language": user.preferred_language,
         "created_at": user.created_at.isoformat(),
         "updated_at": user.updated_at.isoformat(),

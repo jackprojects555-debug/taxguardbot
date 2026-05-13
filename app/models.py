@@ -22,5 +22,6 @@ class Transaction:
     id: int = 0  # assigned by add_transaction; 1-indexed per user
     status: str = "open"  # "open" | "partially_saved" | "fully_saved" | "canceled"
     saved_amount: float = 0.0
+    pension_amount: float = 0.0
     updated_at: Optional[datetime] = None
     canceled_at: Optional[datetime] = None

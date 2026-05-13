@@ -72,8 +72,9 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
         "מע״מ: ₪{vat_amount:,.0f}\n"
         "מס הכנסה: ₪{income_tax_amount:,.0f}\n"
         "ביטוח לאומי: ₪{national_insurance_amount:,.0f}\n"
-        "סוציאליות: ₪{social_savings_amount:,.0f}\n\n"
-        "סה״כ להעברה עכשיו: ₪{total_to_save:,.0f}\n"
+        "סוציאליות: ₪{social_savings_amount:,.0f}\n"
+        "{pension_line}"
+        "\nסה״כ להעברה עכשיו: ₪{total_to_save:,.0f}\n"
         "כסף פנוי אמיתי: ₪{available_amount:,.0f}\n\n"
         "פעולה מומלצת: העבר עכשיו ₪{total_to_save:,.0f} לחשבון השמירה שלך."
     ),
@@ -97,6 +98,8 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     ),
     "onboarding_ask_social_savings_he": "מה שיעור הסוציאליות שלך? (לדוגמה: 5 או 0.05)",
     "onboarding_ask_social_savings_en": "What is your social savings rate? (e.g. 5 or 0.05)",
+    "onboarding_ask_pension_he": "מה שיעור הפנסיה שלך? (לדוגמה: 6 או 0.06)\nשלח 0 לדילוג.",
+    "onboarding_ask_pension_en": "What is your pension rate? (e.g. 6 or 0.06)\nSend 0 to skip.",
     "onboarding_complete_he": ("ההגדרות נשמרו. הבוט מוכן לשימוש!\nשלח סכום כדי לחשב את ההפרשות."),
     "onboarding_complete_en": (
         "Setup complete. The bot is ready!\nSend an income amount to calculate your allocations."

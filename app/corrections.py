@@ -111,6 +111,7 @@ def correct_by_id(user_id: int, transaction_id: int, amount_str: str, user: BotU
         income_tax_rate=user.income_tax_rate,
         national_insurance_rate=user.national_insurance_rate,
         social_savings_rate=user.social_savings_rate,
+        pension_rate=user.pension_rate,
     )
     now = datetime.now()
     update_transaction(
@@ -122,6 +123,7 @@ def correct_by_id(user_id: int, transaction_id: int, amount_str: str, user: BotU
         income_tax_amount=result["income_tax_amount"],
         national_insurance_amount=result["national_insurance_amount"],
         social_savings_amount=result["social_savings_amount"],
+        pension_amount=result["pension_amount"],
         total_to_save=result["total_to_save"],
         available_amount=result["available_amount"],
         remaining_amount=result["total_to_save"],
