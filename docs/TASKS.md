@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-010] Status command enhancement
+Status: Complete
+Merged: feature/v2-010-status-enhancement → main (PR #23)
+
 ### [V2-009] VAT period flag
 Status: Complete
 Merged: feature/v2-009-vat-period → main (PR #22)

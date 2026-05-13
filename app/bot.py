@@ -98,13 +98,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not active:
             response = format_message("status_no_data_he")
         else:
+            total_pension = sum(t.pension_amount for t in active)
+            pension_line = f"פנסיה: ₪{total_pension:,.0f}\n" if total_pension > 0 else ""
+            ni_mode_label = " (קבוע)" if user and user.national_insurance_mode == "fixed" else ""
+            ss_mode_label = " (קבוע)" if user and user.social_savings_mode == "fixed" else ""
             response = format_message(
                 "status_summary_he",
                 total_income=sum(t.amount for t in active),
                 total_vat=sum(t.vat_amount for t in active),
                 total_income_tax=sum(t.income_tax_amount for t in active),
                 total_national_insurance=sum(t.national_insurance_amount for t in active),
+                ni_mode_label=ni_mode_label,
                 total_social_savings=sum(t.social_savings_amount for t in active),
+                ss_mode_label=ss_mode_label,
+                pension_line=pension_line,
                 total_to_save=sum(t.total_to_save for t in active),
                 total_saved=sum(t.saved_amount for t in active),
                 total_gap=sum(
