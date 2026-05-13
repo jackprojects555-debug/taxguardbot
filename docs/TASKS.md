@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-005] CMS foundation
+Status: Complete
+Merged: feature/v2-005-cms-foundation → main (PR #18)
+
 ### [V2-004] Onboarding: language detection and bilingual flow
 Status: Complete
 Merged: feature/v2-004-onboarding-language → main (PR #17)
