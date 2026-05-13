@@ -1,5 +1,6 @@
 from typing import Optional, Tuple
 
+from app.cms import t
 from app.message_store import format_message
 from app.user_storage import BotUser, update_user_profile
 
@@ -44,7 +45,7 @@ def parse_yes_no(text: str) -> Optional[bool]:
 
 def start_onboarding(user_id: int, lang: str = "he") -> str:
     update_user_profile(user_id, onboarding_step=STEP_BUSINESS_TYPE)
-    return format_message(f"onboarding_welcome_{lang}")
+    return t("onboarding_welcome", lang)
 
 
 def handle_onboarding(user: BotUser, text: str) -> Tuple[str, bool]:
