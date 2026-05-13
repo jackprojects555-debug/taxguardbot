@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-008] Admin: CMS text editor endpoints
+Status: Complete
+Merged: feature/v2-008-cms-admin-endpoints → main (PR #21)
+
 ### [V2-007] NI / social savings fixed-monthly mode
 Status: Complete
 Merged: feature/v2-007-fixed-monthly-mode → main (PR #20)

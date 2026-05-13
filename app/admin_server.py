@@ -11,7 +11,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from pydantic.functional_validators import field_validator
 
-from app.message_store import get_messages_snapshot, replace_messages
+from app.cms import delete_text, get_text, list_texts, set_text
+from app.message_store import default_message_keys, get_messages_snapshot, replace_messages
 from app.storage import (
     delete_all_transactions,
     get_transactions,
@@ -221,6 +222,104 @@ async def admin_delete_user(
 )
 async def admin_user_transactions(telegram_user_id: int) -> dict:
     return {"transactions": [_transaction_to_api(t) for t in get_transactions(telegram_user_id)]}
+
+
+_KNOWN_LANGS = ("he", "en")
+
+
+def _split_message_key(combined: str):
+    """Split 'help_he' → ('help', 'he'). Returns (None, None) if no language suffix."""
+    for lang in _KNOWN_LANGS:
+        if combined.endswith(f"_{lang}"):
+            return combined[: -(len(lang) + 1)], lang
+    return None, None
+
+
+def _effective_entries_for_key(key: str) -> list:
+    defaults = default_message_keys()
+    result = []
+    for lang in _KNOWN_LANGS:
+        db_content = get_text(key, lang)
+        if db_content is not None:
+            result.append({"language": lang, "content": db_content, "source": "db"})
+        elif f"{key}_{lang}" in defaults:
+            result.append(
+                {"language": lang, "content": defaults[f"{key}_{lang}"], "source": "default"}
+            )
+    return result
+
+
+@app.get("/api/admin/texts", dependencies=[Depends(verify_admin)])
+async def admin_list_texts() -> dict:
+    defaults = default_message_keys()
+    known: dict[tuple, str] = {}
+    for combined, content in defaults.items():
+        base_key, lang = _split_message_key(combined)
+        if base_key is not None:
+            known[(base_key, lang)] = content
+
+    db_entries = {(r["key"], r["language"]): r for r in list_texts()}
+    all_pairs = sorted(set(known.keys()) | set(db_entries.keys()))
+    result = []
+    for key, lang in all_pairs:
+        if (key, lang) in db_entries:
+            r = db_entries[(key, lang)]
+            result.append(
+                {
+                    "key": key,
+                    "language": lang,
+                    "content": r["content"],
+                    "source": "db",
+                    "updated_at": r["updated_at"],
+                }
+            )
+        else:
+            result.append(
+                {
+                    "key": key,
+                    "language": lang,
+                    "content": known[(key, lang)],
+                    "source": "default",
+                    "updated_at": None,
+                }
+            )
+    return {"texts": result}
+
+
+@app.get("/api/admin/texts/{key}", dependencies=[Depends(verify_admin)])
+async def admin_get_text_key(key: str) -> dict:
+    entries = _effective_entries_for_key(key)
+    if not entries:
+        raise HTTPException(status_code=404, detail=f"No text entries found for key: {key}")
+    return {"key": key, "entries": entries}
+
+
+class TextPutBody(BaseModel):
+    content: str
+
+    @field_validator("content")
+    @classmethod
+    def content_must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("content must not be empty")
+        return v
+
+
+@app.put("/api/admin/texts/{key}/{lang}", dependencies=[Depends(verify_admin)])
+async def admin_put_text(key: str, lang: str, body: TextPutBody) -> dict:
+    if lang not in _KNOWN_LANGS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported language: {lang}. Use one of: {', '.join(_KNOWN_LANGS)}",
+        )
+    set_text(key, lang, body.content)
+    return {"key": key, "language": lang, "content": body.content}
+
+
+@app.delete("/api/admin/texts/{key}/{lang}", dependencies=[Depends(verify_admin)])
+async def admin_delete_text(key: str, lang: str) -> dict:
+    deleted = delete_text(key, lang)
+    return {"deleted": deleted}
 
 
 class MessagesReplaceBody(BaseModel):
