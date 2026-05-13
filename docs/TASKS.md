@@ -51,5 +51,53 @@ Merged: feature/engineering-migration → main
 
 ---
 
-## Backlog — Product
+## Backlog — V2 Core
 
+### [V2-001] Schema migration: preferred_language column
+Add `preferred_language TEXT NOT NULL DEFAULT 'he'` to users table.
+Update BotUser dataclass, _row_to_user, user_summary_dict.
+Add _apply_migrations() to handle existing databases without column.
+
+### [V2-002] Command alias registry
+New module: app/command_registry.py
+Alias table mapping Hebrew + English inputs to action names.
+Income parser: handles ₪, commas, נוכה, vat excluded.
+Dispatcher replaces scattered regex in bot.py message handler.
+
+### [V2-003] Help command (both languages)
+/help and free-text "help" / "עזרה" → full command list.
+Response language determined by user's preferred_language.
+First real end-to-end test of the registry + language output.
+
+### [V2-004] Onboarding: language selection step
+Add language selection as step 0 of onboarding.
+Auto-detect from Telegram language_code as default.
+Save to preferred_language. All subsequent onboarding messages use user's language.
+
+### [V2-005] CMS foundation
+New DB table: bot_texts (key, language, content, updated_at).
+New function: t(key, lang, **kwargs) with hard-coded fallback.
+Migrate welcome and help strings first.
+
+### [V2-006] Pension allocation field
+Add pension_rate to user profile (default 0.0).
+Update calculations.py, models.py, onboarding advanced settings.
+Status command shows pension line if pension_rate > 0.
+
+### [V2-007] NI / social savings fixed-monthly mode
+Add national_insurance_mode + national_insurance_fixed columns.
+Same for social_savings.
+Add calculation branch. Update onboarding advanced settings.
+
+### [V2-008] Admin: CMS text editor endpoints
+GET /admin/texts, GET /admin/texts/{key}, PUT /admin/texts/{key}/{lang}.
+Returns hard-coded fallback if key not in DB.
+Validates non-empty content before saving.
+
+### [V2-009] VAT period flag
+Add vat_period column to users (monthly / bi-monthly, default monthly).
+No calculation change yet — groundwork for period-aware reports.
+
+### [V2-010] Status command enhancement
+Show pension line if pension_rate > 0.
+Show NI and social savings in correct mode (percentage vs fixed).
