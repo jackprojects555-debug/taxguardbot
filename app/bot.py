@@ -113,7 +113,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(show_last(user_id))
 
     elif action == "help":
-        await update.message.reply_text(format_message("help_he"))
+        lang = user.preferred_language if user else "he"
+        await update.message.reply_text(format_message(f"help_{lang}"))
 
     elif action == "cancel_last":
         await update.message.reply_text(cancel_last(user_id))
