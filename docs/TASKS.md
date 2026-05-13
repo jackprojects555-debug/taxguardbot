@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-003] Help command (both languages)
+Status: Complete
+Merged: feature/v2-003-help-command → main (PR #16)
+
 ### [V2-002] Command alias registry
 Status: Complete
 Merged: feature/v2-002-command-registry → main (PR #15)
