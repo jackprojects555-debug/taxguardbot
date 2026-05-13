@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-004] Onboarding: language detection and bilingual flow
+Status: Complete
+Merged: feature/v2-004-onboarding-language → main (PR #17)
+
 ### [V2-003] Help command (both languages)
 Status: Complete
 Merged: feature/v2-003-help-command → main (PR #16)
