@@ -46,6 +46,14 @@ CREATE TABLE IF NOT EXISTS transactions (
     updated_at TEXT,
     canceled_at TEXT,
     PRIMARY KEY (user_id, id)
+);
+
+CREATE TABLE IF NOT EXISTS bot_texts (
+    key TEXT NOT NULL,
+    language TEXT NOT NULL,
+    content TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (key, language)
 )
 """
 

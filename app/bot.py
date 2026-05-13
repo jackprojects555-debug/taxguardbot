@@ -7,6 +7,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 
 from app.calculations import calculate_income_split
+from app.cms import t
 from app.command_registry import is_unsupported_format, parse_command
 from app.corrections import (
     cancel_by_id,
@@ -121,7 +122,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif action == "help":
         lang = user.preferred_language if user else "he"
-        await update.message.reply_text(format_message(f"help_{lang}"))
+        await update.message.reply_text(t("help", lang))
 
     elif action == "cancel_last":
         await update.message.reply_text(cancel_last(user_id))
