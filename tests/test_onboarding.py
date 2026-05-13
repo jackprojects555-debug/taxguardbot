@@ -12,6 +12,7 @@ from app.onboarding import (
     handle_onboarding,
     parse_business_type,
     parse_rate,
+    parse_rate_or_fixed,
     parse_yes_no,
     start_onboarding,
 )
@@ -400,3 +401,125 @@ def test_pension_step_english_prompt_contains_pension():
     # The reply from social_savings step should mention pension
     user = get_user(24)
     assert user.onboarding_step == STEP_PENSION
+
+
+# ---------------------------------------------------------------------------
+# parse_rate_or_fixed
+# ---------------------------------------------------------------------------
+
+
+def test_parse_rate_or_fixed_percentage_integer():
+    result = parse_rate_or_fixed("8")
+    assert result == ("percentage", pytest.approx(0.08), 0.0)
+
+
+def test_parse_rate_or_fixed_percentage_decimal():
+    result = parse_rate_or_fixed("0.05")
+    assert result == ("percentage", pytest.approx(0.05), 0.0)
+
+
+def test_parse_rate_or_fixed_percentage_zero():
+    result = parse_rate_or_fixed("0")
+    assert result == ("percentage", pytest.approx(0.0), 0.0)
+
+
+def test_parse_rate_or_fixed_fixed_monthly_en():
+    result = parse_rate_or_fixed("1200 monthly")
+    assert result == ("fixed", 0.0, pytest.approx(1200.0))
+
+
+def test_parse_rate_or_fixed_fixed_keyword_he():
+    result = parse_rate_or_fixed("1200 חודשי")
+    assert result == ("fixed", 0.0, pytest.approx(1200.0))
+
+
+def test_parse_rate_or_fixed_fixed_keyword_kavu():
+    result = parse_rate_or_fixed("800 קבוע")
+    assert result == ("fixed", 0.0, pytest.approx(800.0))
+
+
+def test_parse_rate_or_fixed_fixed_keyword_first():
+    result = parse_rate_or_fixed("monthly 1200")
+    assert result == ("fixed", 0.0, pytest.approx(1200.0))
+
+
+def test_parse_rate_or_fixed_fixed_zero():
+    result = parse_rate_or_fixed("0 monthly")
+    assert result == ("fixed", 0.0, pytest.approx(0.0))
+
+
+def test_parse_rate_or_fixed_invalid_returns_none():
+    assert parse_rate_or_fixed("abc") is None
+
+
+def test_parse_rate_or_fixed_invalid_rate_over_100():
+    assert parse_rate_or_fixed("200") is None
+
+
+def test_parse_rate_or_fixed_negative_fixed_returns_none():
+    assert parse_rate_or_fixed("-100 monthly") is None
+
+
+def test_parse_rate_or_fixed_keyword_only_no_number():
+    assert parse_rate_or_fixed("monthly") is None
+
+
+# ---------------------------------------------------------------------------
+# Fixed mode through onboarding flow
+# ---------------------------------------------------------------------------
+
+
+def _reach_ni_step(user_id: int, lang: str = "he") -> None:
+    upsert_from_telegram(telegram_user_id=user_id)
+    update_user_profile(user_id, preferred_language=lang)
+    start_onboarding(user_id, lang=lang)
+    handle_onboarding(get_user(user_id), "1")  # vat_registered
+    handle_onboarding(get_user(user_id), "yes" if lang == "en" else "כן")  # vat_included
+    handle_onboarding(get_user(user_id), "20")  # income_tax
+
+
+def test_ni_fixed_mode_saved_from_onboarding():
+    _reach_ni_step(30)
+    reply, done = handle_onboarding(get_user(30), "1200 monthly")
+    assert not done
+    u = get_user(30)
+    assert u.national_insurance_mode == "fixed"
+    assert u.national_insurance_fixed == pytest.approx(1200.0)
+    assert u.national_insurance_rate == pytest.approx(0.0)
+    assert u.onboarding_step == STEP_SOCIAL_SAVINGS
+
+
+def test_ni_percentage_mode_unchanged():
+    _reach_ni_step(31)
+    handle_onboarding(get_user(31), "8")
+    u = get_user(31)
+    assert u.national_insurance_mode == "percentage"
+    assert u.national_insurance_rate == pytest.approx(0.08)
+    assert u.national_insurance_fixed == pytest.approx(0.0)
+
+
+def test_ni_invalid_input_reprompts():
+    _reach_ni_step(32)
+    reply, done = handle_onboarding(get_user(32), "abc")
+    assert not done
+    assert get_user(32).onboarding_step == STEP_NATIONAL_INSURANCE
+
+
+def test_ss_fixed_mode_saved_from_onboarding():
+    _reach_ni_step(33)
+    handle_onboarding(get_user(33), "8")  # NI percentage
+    reply, done = handle_onboarding(get_user(33), "800 חודשי")
+    assert not done
+    u = get_user(33)
+    assert u.social_savings_mode == "fixed"
+    assert u.social_savings_fixed == pytest.approx(800.0)
+    assert u.social_savings_rate == pytest.approx(0.0)
+    assert u.onboarding_step == STEP_PENSION
+
+
+def test_ss_invalid_input_reprompts():
+    _reach_ni_step(34)
+    handle_onboarding(get_user(34), "8")  # NI
+    reply, done = handle_onboarding(get_user(34), "garbage")
+    assert not done
+    assert get_user(34).onboarding_step == STEP_SOCIAL_SAVINGS

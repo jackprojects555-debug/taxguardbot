@@ -164,7 +164,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             vat_included=vat_included,
             income_tax_rate=user.income_tax_rate if user else 0.20,
             national_insurance_rate=user.national_insurance_rate if user else 0.08,
+            national_insurance_mode=user.national_insurance_mode if user else "percentage",
+            national_insurance_fixed=user.national_insurance_fixed if user else 0.0,
             social_savings_rate=user.social_savings_rate if user else 0.05,
+            social_savings_mode=user.social_savings_mode if user else "percentage",
+            social_savings_fixed=user.social_savings_fixed if user else 0.0,
             pension_rate=user.pension_rate if user else 0.0,
         )
 

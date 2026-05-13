@@ -110,7 +110,11 @@ def correct_by_id(user_id: int, transaction_id: int, amount_str: str, user: BotU
         vat_included=t.vat_included,
         income_tax_rate=user.income_tax_rate,
         national_insurance_rate=user.national_insurance_rate,
+        national_insurance_mode=user.national_insurance_mode,
+        national_insurance_fixed=user.national_insurance_fixed,
         social_savings_rate=user.social_savings_rate,
+        social_savings_mode=user.social_savings_mode,
+        social_savings_fixed=user.social_savings_fixed,
         pension_rate=user.pension_rate,
     )
     now = datetime.now()
