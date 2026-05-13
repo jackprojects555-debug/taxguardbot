@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-006] Pension allocation field
+Status: Complete
+Merged: feature/v2-006-pension-rate → main (PR #19)
+
 ### [V2-005] CMS foundation
 Status: Complete
 Merged: feature/v2-005-cms-foundation → main (PR #18)
