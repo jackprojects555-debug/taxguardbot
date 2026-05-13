@@ -57,6 +57,11 @@ def test_new_user_default_social_savings_rate():
     assert u.social_savings_rate == pytest.approx(0.05)
 
 
+def test_new_user_default_preferred_language():
+    u = BotUser(telegram_user_id=1)
+    assert u.preferred_language == "he"
+
+
 # ---------------------------------------------------------------------------
 # upsert_from_telegram
 # ---------------------------------------------------------------------------
@@ -134,6 +139,19 @@ def test_update_business_type():
     user = get_user(1)
     assert user.business_type == "vat_exempt"
     assert user.vat_included_default is False
+
+
+def test_update_preferred_language():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, preferred_language="en")
+    assert get_user(1).preferred_language == "en"
+
+
+def test_preferred_language_persists_across_upsert():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, preferred_language="en")
+    upsert_from_telegram(telegram_user_id=1, username="alice")
+    assert get_user(1).preferred_language == "en"
 
 
 def test_update_unknown_field_ignored():
