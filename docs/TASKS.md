@@ -12,6 +12,11 @@ _(none)_
 
 ## Done
 
+### [PROD-007] PostgreSQL backend + Render deployment config
+Status: Complete
+Merged: feature/prod-007-postgres → main (PR #13)
+Note: Neon DB is provisioned and schema/data migrated. Local dev continues on SQLite (no DATABASE_URL in .env). Switch to Neon when bot is deployed to a remote server.
+
 ### [PROD-006] Database migration
 Status: Complete
 Merged: feature/prod-006-database → main (PR #12)
