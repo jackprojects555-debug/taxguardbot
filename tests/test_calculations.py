@@ -16,6 +16,7 @@ def test_returns_all_keys():
         "income_tax_amount",
         "national_insurance_amount",
         "social_savings_amount",
+        "pension_amount",
         "total_to_save",
         "available_amount",
     }
@@ -142,6 +143,7 @@ def test_total_to_save_is_sum_of_components_vat_included():
         + r["income_tax_amount"]
         + r["national_insurance_amount"]
         + r["social_savings_amount"]
+        + r["pension_amount"]
     )
     assert r["total_to_save"] == pytest.approx(expected, rel=1e-9)
 
@@ -153,5 +155,33 @@ def test_total_to_save_is_sum_of_components_vat_excluded():
         + r["income_tax_amount"]
         + r["national_insurance_amount"]
         + r["social_savings_amount"]
+        + r["pension_amount"]
     )
     assert r["total_to_save"] == pytest.approx(expected, rel=1e-9)
+
+
+# ---------------------------------------------------------------------------
+# Pension rate
+# ---------------------------------------------------------------------------
+
+
+def test_pension_amount_zero_by_default():
+    r = calculate_income_split(10000, vat_included=False)
+    assert r["pension_amount"] == pytest.approx(0.0)
+
+
+def test_pension_amount_computed_from_base():
+    r = calculate_income_split(10000, vat_included=False, pension_rate=0.06)
+    assert r["pension_amount"] == pytest.approx(600.0)
+
+
+def test_pension_included_in_total_to_save():
+    r = calculate_income_split(10000, vat_included=False, pension_rate=0.06)
+    assert r["total_to_save"] == pytest.approx(3300.0 + 600.0)
+    assert r["available_amount"] == pytest.approx(10000.0 - r["total_to_save"])
+
+
+def test_pension_vat_included():
+    r = calculate_income_split(11700, vat_included=True, pension_rate=0.06)
+    assert r["pension_amount"] == pytest.approx(600.0, rel=1e-6)
+    assert r["total_to_save"] == pytest.approx(5600.0, rel=1e-6)

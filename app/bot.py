@@ -165,6 +165,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             income_tax_rate=user.income_tax_rate if user else 0.20,
             national_insurance_rate=user.national_insurance_rate if user else 0.08,
             social_savings_rate=user.social_savings_rate if user else 0.05,
+            pension_rate=user.pension_rate if user else 0.0,
         )
 
         now = datetime.now()
@@ -176,6 +177,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             income_tax_amount=calc["income_tax_amount"],
             national_insurance_amount=calc["national_insurance_amount"],
             social_savings_amount=calc["social_savings_amount"],
+            pension_amount=calc["pension_amount"],
             total_to_save=calc["total_to_save"],
             remaining_amount=calc["total_to_save"],
             available_amount=calc["available_amount"],
@@ -184,6 +186,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         add_transaction(user_id, transaction)
 
+        pension_line = (
+            f"פנסיה: ₪{calc['pension_amount']:,.0f}\n" if calc["pension_amount"] > 0 else ""
+        )
         await update.message.reply_text(
             format_message(
                 "transaction_success_he",
@@ -192,6 +197,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 income_tax_amount=calc["income_tax_amount"],
                 national_insurance_amount=calc["national_insurance_amount"],
                 social_savings_amount=calc["social_savings_amount"],
+                pension_line=pension_line,
                 total_to_save=calc["total_to_save"],
                 available_amount=calc["available_amount"],
             )

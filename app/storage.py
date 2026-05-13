@@ -15,6 +15,7 @@ def _row_to_transaction(row) -> Transaction:
         income_tax_amount=row["income_tax_amount"],
         national_insurance_amount=row["national_insurance_amount"],
         social_savings_amount=row["social_savings_amount"],
+        pension_amount=row["pension_amount"] if row["pension_amount"] is not None else 0.0,
         total_to_save=row["total_to_save"],
         remaining_amount=row["remaining_amount"],
         available_amount=row["available_amount"],
@@ -40,9 +41,9 @@ def add_transaction(user_id: int, transaction: Transaction) -> Transaction:
             INSERT INTO transactions (
                 id, user_id, amount, vat_included, vat_amount, base_amount,
                 income_tax_amount, national_insurance_amount, social_savings_amount,
-                total_to_save, remaining_amount, available_amount, month, created_at,
-                status, saved_amount, updated_at, canceled_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                pension_amount, total_to_save, remaining_amount, available_amount,
+                month, created_at, status, saved_amount, updated_at, canceled_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 next_id,
@@ -54,6 +55,7 @@ def add_transaction(user_id: int, transaction: Transaction) -> Transaction:
                 transaction.income_tax_amount,
                 transaction.national_insurance_amount,
                 transaction.social_savings_amount,
+                transaction.pension_amount,
                 transaction.total_to_save,
                 transaction.remaining_amount,
                 transaction.available_amount,
@@ -98,6 +100,7 @@ def update_transaction(user_id: int, transaction_id: int, **kwargs) -> Optional[
         "base_amount",
         "income_tax_amount",
         "national_insurance_amount",
+        "pension_amount",
         "social_savings_amount",
         "total_to_save",
         "available_amount",

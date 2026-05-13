@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     income_tax_rate DOUBLE PRECISION NOT NULL DEFAULT 0.20,
     national_insurance_rate DOUBLE PRECISION NOT NULL DEFAULT 0.08,
     social_savings_rate DOUBLE PRECISION NOT NULL DEFAULT 0.05,
+    pension_rate DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     preferred_language TEXT NOT NULL DEFAULT 'he',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -36,6 +37,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     income_tax_amount DOUBLE PRECISION NOT NULL,
     national_insurance_amount DOUBLE PRECISION NOT NULL,
     social_savings_amount DOUBLE PRECISION NOT NULL,
+    pension_amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     total_to_save DOUBLE PRECISION NOT NULL,
     remaining_amount DOUBLE PRECISION NOT NULL,
     available_amount DOUBLE PRECISION NOT NULL,
@@ -104,6 +106,8 @@ def get_connection() -> _Conn:
 
 _MIGRATIONS = [
     "ALTER TABLE users ADD COLUMN preferred_language TEXT NOT NULL DEFAULT 'he'",
+    "ALTER TABLE users ADD COLUMN pension_rate DOUBLE PRECISION NOT NULL DEFAULT 0.0",
+    "ALTER TABLE transactions ADD COLUMN pension_amount DOUBLE PRECISION NOT NULL DEFAULT 0.0",
 ]
 
 
