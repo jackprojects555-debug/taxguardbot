@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-002] Command alias registry
+Status: Complete
+Merged: feature/v2-002-command-registry → main (PR #15)
+
 ### [V2-001] Schema migration: preferred_language column
 Status: Complete
 Merged: feature/v2-001-preferred-language → main (PR #14)
