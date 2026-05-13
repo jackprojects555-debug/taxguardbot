@@ -65,12 +65,7 @@ def upsert_from_telegram(
             ON CONFLICT(telegram_user_id) DO UPDATE SET
                 username = COALESCE(excluded.username, username),
                 display_name = COALESCE(excluded.display_name, display_name),
-                updated_at = CASE
-                    WHEN excluded.username IS NOT username
-                         OR excluded.display_name IS NOT display_name
-                    THEN excluded.updated_at
-                    ELSE updated_at
-                END
+                updated_at = excluded.updated_at
             """,
             (telegram_user_id, username, display_name, now, now),
         )
