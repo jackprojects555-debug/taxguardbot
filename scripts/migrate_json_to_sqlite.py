@@ -1,23 +1,46 @@
 """
-One-time migration: imports data/users.json and data/transactions.json into SQLite.
+One-time migration: imports data/users.json and data/transactions.json into the database.
 
-Safe to run multiple times — existing rows are skipped via INSERT OR IGNORE.
+Safe to run multiple times — existing rows are skipped.
+Works with both SQLite (local) and PostgreSQL (production via DATABASE_URL).
 
 Usage:
-    python scripts/migrate_json_to_sqlite.py
+    python scripts/migrate_json_to_sqlite.py                          # SQLite
+    DATABASE_URL=postgresql://... python scripts/migrate_json_to_sqlite.py  # PostgreSQL
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
-# Allow running from project root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import get_connection, init_db  # noqa: E402
 
 USERS_FILE = Path("data/users.json")
 TRANSACTIONS_FILE = Path("data/transactions.json")
+
+_IS_POSTGRES = bool(os.getenv("DATABASE_URL"))
+_INSERT_USERS = """
+    INSERT INTO users (
+        telegram_user_id, username, display_name, notes, is_blocked,
+        onboarding_completed, onboarding_step, profile_notified,
+        business_type, vat_included_default,
+        income_tax_rate, national_insurance_rate, social_savings_rate,
+        created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT (telegram_user_id) DO NOTHING
+    """
+_INSERT_TRANSACTIONS = """
+    INSERT INTO transactions (
+        id, user_id, amount, vat_included, vat_amount, base_amount,
+        income_tax_amount, national_insurance_amount, social_savings_amount,
+        total_to_save, remaining_amount, available_amount,
+        month, created_at, status, saved_amount, updated_at, canceled_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT (user_id, id) DO NOTHING
+    """
 
 
 def migrate_users(conn):
@@ -30,15 +53,7 @@ def migrate_users(conn):
     for _key, u in raw.items():
         try:
             conn.execute(
-                """
-                INSERT OR IGNORE INTO users (
-                    telegram_user_id, username, display_name, notes, is_blocked,
-                    onboarding_completed, onboarding_step, profile_notified,
-                    business_type, vat_included_default,
-                    income_tax_rate, national_insurance_rate, social_savings_rate,
-                    created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
+                _INSERT_USERS,
                 (
                     int(u["telegram_user_id"]),
                     u.get("username"),
@@ -77,14 +92,7 @@ def migrate_transactions(conn):
                 created_at = t.get("created_at", "2026-01-01T00:00:00")
                 total_to_save = float(t["total_to_save"])
                 conn.execute(
-                    """
-                    INSERT OR IGNORE INTO transactions (
-                        id, user_id, amount, vat_included, vat_amount, base_amount,
-                        income_tax_amount, national_insurance_amount, social_savings_amount,
-                        total_to_save, remaining_amount, available_amount,
-                        month, created_at, status, saved_amount, updated_at, canceled_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
+                    _INSERT_TRANSACTIONS,
                     (
                         int(t.get("id", idx + 1)),
                         user_id,
@@ -113,7 +121,8 @@ def migrate_transactions(conn):
 
 
 def main():
-    print("Initializing database...")
+    backend = "PostgreSQL" if _IS_POSTGRES else "SQLite"
+    print(f"Initializing database ({backend})...")
     init_db()
 
     with get_connection() as conn:

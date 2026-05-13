@@ -30,10 +30,10 @@ def _row_to_transaction(row) -> Transaction:
 def add_transaction(user_id: int, transaction: Transaction) -> Transaction:
     with get_connection() as conn:
         row = conn.execute(
-            "SELECT COALESCE(MAX(id), 0) + 1 FROM transactions WHERE user_id = ?",
+            "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM transactions WHERE user_id = ?",
             (user_id,),
         ).fetchone()
-        next_id = row[0]
+        next_id = row["next_id"]
         transaction.id = next_id
         conn.execute(
             """
