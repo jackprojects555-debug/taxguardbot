@@ -32,7 +32,7 @@ def test_t_returns_debug_marker_for_completely_unknown_key():
 
 
 def test_t_formats_kwargs():
-    # transaction_success_he has {amount:,.0f} etc
+    # transaction_success_he has {amount:,.0f} etc; pension_line added in V2-006
     msg = t(
         "transaction_success",
         "he",
@@ -41,6 +41,7 @@ def test_t_formats_kwargs():
         income_tax_amount=1000,
         national_insurance_amount=400,
         social_savings_amount=250,
+        pension_line="",
         total_to_save=3054,
         available_amount=6946,
     )
