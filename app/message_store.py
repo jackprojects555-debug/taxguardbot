@@ -19,6 +19,36 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
         "transaction_* messages only."
     ),
     "reset_success_en": "All data has been reset.",
+    "help_he": (
+        "פקודות זמינות:\n\n"
+        "סכום — רישום הכנסה (למשל: 11700)\n"
+        "סכום נוכה — הכנסה ללא מע״מ\n"
+        "העברתי — סימון העברה מלאה\n"
+        "העברתי סכום — סימון העברה חלקית\n"
+        "מצב — סיכום החודש\n"
+        "רשימה — רשימת עסקאות\n"
+        "אחרון — עסקה אחרונה\n"
+        "בטל אחרון — ביטול עסקה אחרונה\n"
+        "בטל מספר — ביטול עסקה לפי מספר\n"
+        "תקן אחרון סכום — תיקון עסקה אחרונה\n"
+        "תקן מספר סכום — תיקון עסקה לפי מספר\n"
+        "עזרה — הצגת רשימה זו"
+    ),
+    "help_en": (
+        "Available commands:\n\n"
+        "amount — record income (e.g. 11700)\n"
+        "amount vat excluded — income without VAT\n"
+        "saved — mark latest transaction fully saved\n"
+        "saved amount — mark partial amount saved\n"
+        "status — current month summary\n"
+        "list — recent transactions\n"
+        "last — last transaction\n"
+        "cancel last — cancel latest transaction\n"
+        "cancel N — cancel transaction #N\n"
+        "fix last amount — correct latest transaction\n"
+        "fix N amount — correct transaction #N\n"
+        "help — show this list"
+    ),
     "user_blocked_he": "הגישה לבוט חסומה למשתמש זה.",
     "status_no_data_he": "אין עדיין נתונים החודש.",
     "status_summary_he": (

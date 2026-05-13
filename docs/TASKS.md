@@ -12,6 +12,10 @@ _(none)_
 
 ## Done
 
+### [V2-001] Schema migration: preferred_language column
+Status: Complete
+Merged: feature/v2-001-preferred-language → main (PR #14)
+
 ### [PROD-007] PostgreSQL backend + Render deployment config
 Status: Complete
 Merged: feature/prod-007-postgres → main (PR #13)

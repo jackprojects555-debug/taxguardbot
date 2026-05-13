@@ -7,6 +7,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 
 from app.calculations import calculate_income_split
+from app.command_registry import is_unsupported_format, parse_command
 from app.corrections import (
     cancel_by_id,
     cancel_last,
@@ -69,17 +70,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_user_profile(user_id, profile_notified=True)
         await update.message.reply_text(format_message("profile_notified_he"))
 
-    if text == "העברתי" or text.startswith("העברתי "):
-        amount_text = text[len("העברתי") :].strip()
-        await update.message.reply_text(process_transfer(user_id, amount_text))
+    result = parse_command(text)
+
+    if result is None:
+        if is_unsupported_format(text):
+            await update.message.reply_text(format_message("unsupported_format_en"))
+        else:
+            await update.message.reply_text(format_message("invalid_number_en"))
         return
 
-    if text.lower() == "reset" or text in ("אפס", "נקה", "מחק"):
-        clear_transactions(user_id)
-        await update.message.reply_text(format_message("reset_success_en"))
-        return
+    action, args = result
 
-    if text == "מצב":
+    if action == "status":
         now = datetime.now()
         current_month = now.strftime("%Y-%m")
         all_txns = get_transactions(user_id)
@@ -88,110 +90,67 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not active:
             response = format_message("status_no_data_he")
         else:
-            total_income = sum(t.amount for t in active)
-            total_vat = sum(t.vat_amount for t in active)
-            total_income_tax = sum(t.income_tax_amount for t in active)
-            total_national_insurance = sum(t.national_insurance_amount for t in active)
-            total_social_savings = sum(t.social_savings_amount for t in active)
-            total_to_save = sum(t.total_to_save for t in active)
-            total_saved = sum(t.saved_amount for t in active)
-            total_gap = sum(
-                t.remaining_amount for t in active if t.status in ("open", "partially_saved")
-            )
-            total_available = sum(t.available_amount for t in active)
-
             response = format_message(
                 "status_summary_he",
-                total_income=total_income,
-                total_vat=total_vat,
-                total_income_tax=total_income_tax,
-                total_national_insurance=total_national_insurance,
-                total_social_savings=total_social_savings,
-                total_to_save=total_to_save,
-                total_saved=total_saved,
-                total_gap=total_gap,
-                total_available=total_available,
+                total_income=sum(t.amount for t in active),
+                total_vat=sum(t.vat_amount for t in active),
+                total_income_tax=sum(t.income_tax_amount for t in active),
+                total_national_insurance=sum(t.national_insurance_amount for t in active),
+                total_social_savings=sum(t.social_savings_amount for t in active),
+                total_to_save=sum(t.total_to_save for t in active),
+                total_saved=sum(t.saved_amount for t in active),
+                total_gap=sum(
+                    t.remaining_amount for t in active if t.status in ("open", "partially_saved")
+                ),
+                total_available=sum(t.available_amount for t in active),
             )
-
         await update.message.reply_text(response)
-        return
 
-    if text == "אחרון":
-        await update.message.reply_text(show_last(user_id))
-        return
-
-    if text == "רשימה":
+    elif action == "list":
         await update.message.reply_text(show_list(user_id))
-        return
 
-    if text == "בטל אחרון":
+    elif action == "last":
+        await update.message.reply_text(show_last(user_id))
+
+    elif action == "help":
+        await update.message.reply_text(format_message("help_he"))
+
+    elif action == "cancel_last":
         await update.message.reply_text(cancel_last(user_id))
-        return
 
-    if text.startswith("בטל "):
-        id_str = text[len("בטל ") :].strip()
-        try:
-            await update.message.reply_text(cancel_by_id(user_id, int(id_str)))
-        except ValueError:
-            await update.message.reply_text(format_message("transaction_not_found_he"))
-        return
+    elif action == "cancel_id":
+        await update.message.reply_text(cancel_by_id(user_id, args["transaction_id"]))
 
-    if text.startswith("תקן אחרון "):
-        amount_str = text[len("תקן אחרון ") :].strip()
-        await update.message.reply_text(correct_last(user_id, amount_str, user))
-        return
+    elif action == "reset":
+        clear_transactions(user_id)
+        await update.message.reply_text(format_message("reset_success_en"))
 
-    if text.startswith("תקן "):
-        parts = text[len("תקן ") :].strip().split()
-        if len(parts) == 2:
-            id_str, amount_str = parts
-            try:
-                reply = correct_by_id(user_id, int(id_str), amount_str, user)
-            except ValueError:
-                reply = format_message("transaction_not_found_he")
-        else:
-            reply = format_message("transaction_not_found_he")
-        await update.message.reply_text(reply)
-        return
+    elif action == "saved":
+        await update.message.reply_text(process_transfer(user_id, args["amount_text"]))
 
-    try:
-        # VAT default: VAT-exempt users never include VAT regardless of input.
-        # Registered users use their profile default; "נוכה" overrides to False.
+    elif action == "fix_last":
+        await update.message.reply_text(correct_last(user_id, args["amount_text"], user))
+
+    elif action == "fix_id":
+        await update.message.reply_text(
+            correct_by_id(user_id, args["transaction_id"], args["amount_text"], user)
+        )
+
+    elif action == "income":
+        amount = args["amount"]
+        vat_override = args["vat_override"]
+
+        # VAT-exempt users never include VAT; others use profile default unless overridden.
         if user and user.business_type == "vat_exempt":
             vat_included = False
+        elif vat_override is not None:
+            vat_included = vat_override
         elif user:
             vat_included = user.vat_included_default
         else:
             vat_included = True
 
-        if "נוכה" in text and (not user or user.business_type != "vat_exempt"):
-            vat_included = False
-            text = text.replace("נוכה", "").strip()
-
-        text = text.replace(",", "")
-        text = text.replace(" ", "")
-        text = text.replace("₪", "")
-
-        if not text:
-            response = format_message("invalid_input_empty_en")
-            await update.message.reply_text(response)
-            return
-
-        if text.lower().endswith("k") and text[:-1]:
-            numeric_part = text[:-1].replace(".", "", 1)
-            if numeric_part.isdigit():
-                response = format_message("unsupported_format_en")
-                await update.message.reply_text(response)
-                return
-
-        amount = float(text)
-
-        if amount <= 0:
-            response = format_message("amount_must_be_positive_en")
-            await update.message.reply_text(response)
-            return
-
-        result = calculate_income_split(
+        calc = calculate_income_split(
             amount=amount,
             vat_included=vat_included,
             income_tax_rate=user.income_tax_rate if user else 0.20,
@@ -201,37 +160,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         now = datetime.now()
         transaction = Transaction(
-            amount=result["amount"],
+            amount=calc["amount"],
             vat_included=vat_included,
-            vat_amount=result["vat_amount"],
-            base_amount=result["base_amount"],
-            income_tax_amount=result["income_tax_amount"],
-            national_insurance_amount=result["national_insurance_amount"],
-            social_savings_amount=result["social_savings_amount"],
-            total_to_save=result["total_to_save"],
-            remaining_amount=result["total_to_save"],
-            available_amount=result["available_amount"],
+            vat_amount=calc["vat_amount"],
+            base_amount=calc["base_amount"],
+            income_tax_amount=calc["income_tax_amount"],
+            national_insurance_amount=calc["national_insurance_amount"],
+            social_savings_amount=calc["social_savings_amount"],
+            total_to_save=calc["total_to_save"],
+            remaining_amount=calc["total_to_save"],
+            available_amount=calc["available_amount"],
             month=now.strftime("%Y-%m"),
             created_at=now,
         )
-
         add_transaction(user_id, transaction)
 
-        response = format_message(
-            "transaction_success_he",
-            amount=result["amount"],
-            vat_amount=result["vat_amount"],
-            income_tax_amount=result["income_tax_amount"],
-            national_insurance_amount=result["national_insurance_amount"],
-            social_savings_amount=result["social_savings_amount"],
-            total_to_save=result["total_to_save"],
-            available_amount=result["available_amount"],
+        await update.message.reply_text(
+            format_message(
+                "transaction_success_he",
+                amount=calc["amount"],
+                vat_amount=calc["vat_amount"],
+                income_tax_amount=calc["income_tax_amount"],
+                national_insurance_amount=calc["national_insurance_amount"],
+                social_savings_amount=calc["social_savings_amount"],
+                total_to_save=calc["total_to_save"],
+                available_amount=calc["available_amount"],
+            )
         )
-
-    except ValueError:
-        response = format_message("invalid_number_en")
-
-    await update.message.reply_text(response)
 
 
 def main():
