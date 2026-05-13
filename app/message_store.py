@@ -92,12 +92,28 @@ _DEFAULT_MESSAGES: Dict[str, str] = {
     "onboarding_ask_vat_included_en": "Do your prices include VAT?\nyes / no",
     "onboarding_ask_income_tax_he": "מה שיעור מס ההכנסה שלך? (לדוגמה: 20 או 0.20)",
     "onboarding_ask_income_tax_en": "What is your income tax rate? (e.g. 20 or 0.20)",
-    "onboarding_ask_national_insurance_he": "מה שיעור ביטוח לאומי שלך? (לדוגמה: 8 או 0.08)",
-    "onboarding_ask_national_insurance_en": (
-        "What is your national insurance rate? (e.g. 8 or 0.08)"
+    "onboarding_ask_national_insurance_he": (
+        "מה שיעור ביטוח לאומי שלך?\n"
+        "אחוז (לדוגמה: 8 או 0.08) או סכום חודשי קבוע (לדוגמה: 1200 חודשי)"
     ),
-    "onboarding_ask_social_savings_he": "מה שיעור הסוציאליות שלך? (לדוגמה: 5 או 0.05)",
-    "onboarding_ask_social_savings_en": "What is your social savings rate? (e.g. 5 or 0.05)",
+    "onboarding_ask_national_insurance_en": (
+        "What is your national insurance rate?\n"
+        "Enter a percentage (e.g. 8) or a fixed monthly amount (e.g. 1200 monthly)"
+    ),
+    "onboarding_ask_social_savings_he": (
+        "מה שיעור הסוציאליות שלך?\nאחוז (לדוגמה: 5 או 0.05) או סכום חודשי קבוע (לדוגמה: 800 חודשי)"
+    ),
+    "onboarding_ask_social_savings_en": (
+        "What is your social savings rate?\n"
+        "Enter a percentage (e.g. 5) or a fixed monthly amount (e.g. 800 monthly)"
+    ),
+    "onboarding_invalid_rate_or_fixed_he": (
+        "לא הבנתי. שלח אחוז (למשל: 8) או סכום חודשי קבוע (למשל: 1200 חודשי)."
+    ),
+    "onboarding_invalid_rate_or_fixed_en": (
+        "I didn't understand. Send a percentage (e.g. 8) "
+        "or a fixed monthly amount (e.g. 1200 monthly)."
+    ),
     "onboarding_ask_pension_he": "מה שיעור הפנסיה שלך? (לדוגמה: 6 או 0.06)\nשלח 0 לדילוג.",
     "onboarding_ask_pension_en": "What is your pension rate? (e.g. 6 or 0.06)\nSend 0 to skip.",
     "onboarding_complete_he": ("ההגדרות נשמרו. הבוט מוכן לשימוש!\nשלח סכום כדי לחשב את ההפרשות."),

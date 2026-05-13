@@ -19,7 +19,11 @@ class BotUser:
     vat_included_default: bool = True
     income_tax_rate: float = 0.20
     national_insurance_rate: float = 0.08
+    national_insurance_mode: str = "percentage"
+    national_insurance_fixed: float = 0.0
     social_savings_rate: float = 0.05
+    social_savings_mode: str = "percentage"
+    social_savings_fixed: float = 0.0
     pension_rate: float = 0.0
     preferred_language: str = "he"
     created_at: datetime = None
@@ -47,7 +51,15 @@ def _row_to_user(row) -> BotUser:
         vat_included_default=bool(row["vat_included_default"]),
         income_tax_rate=row["income_tax_rate"],
         national_insurance_rate=row["national_insurance_rate"],
+        national_insurance_mode=row["national_insurance_mode"] or "percentage",
+        national_insurance_fixed=(
+            row["national_insurance_fixed"] if row["national_insurance_fixed"] is not None else 0.0
+        ),
         social_savings_rate=row["social_savings_rate"],
+        social_savings_mode=row["social_savings_mode"] or "percentage",
+        social_savings_fixed=(
+            row["social_savings_fixed"] if row["social_savings_fixed"] is not None else 0.0
+        ),
         pension_rate=row["pension_rate"] if row["pension_rate"] is not None else 0.0,
         preferred_language=row["preferred_language"] or "he",
         created_at=datetime.fromisoformat(row["created_at"]),
@@ -82,7 +94,11 @@ def update_user_profile(telegram_user_id: int, **kwargs) -> Optional[BotUser]:
         "vat_included_default",
         "income_tax_rate",
         "national_insurance_rate",
+        "national_insurance_mode",
+        "national_insurance_fixed",
         "social_savings_rate",
+        "social_savings_mode",
+        "social_savings_fixed",
         "pension_rate",
         "preferred_language",
         "onboarding_completed",
@@ -187,7 +203,11 @@ def user_summary_dict(user: BotUser) -> dict:
         "vat_included_default": user.vat_included_default,
         "income_tax_rate": user.income_tax_rate,
         "national_insurance_rate": user.national_insurance_rate,
+        "national_insurance_mode": user.national_insurance_mode,
+        "national_insurance_fixed": user.national_insurance_fixed,
         "social_savings_rate": user.social_savings_rate,
+        "social_savings_mode": user.social_savings_mode,
+        "social_savings_fixed": user.social_savings_fixed,
         "pension_rate": user.pension_rate,
         "preferred_language": user.preferred_language,
         "created_at": user.created_at.isoformat(),

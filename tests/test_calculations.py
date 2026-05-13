@@ -185,3 +185,94 @@ def test_pension_vat_included():
     r = calculate_income_split(11700, vat_included=True, pension_rate=0.06)
     assert r["pension_amount"] == pytest.approx(600.0, rel=1e-6)
     assert r["total_to_save"] == pytest.approx(5600.0, rel=1e-6)
+
+
+# ---------------------------------------------------------------------------
+# Fixed NI mode
+# ---------------------------------------------------------------------------
+
+
+def test_ni_percentage_mode_default():
+    r = calculate_income_split(10000, vat_included=False)
+    assert r["national_insurance_amount"] == pytest.approx(800.0)
+
+
+def test_ni_fixed_mode_uses_fixed_amount():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        national_insurance_mode="fixed",
+        national_insurance_fixed=1200.0,
+    )
+    assert r["national_insurance_amount"] == pytest.approx(1200.0)
+
+
+def test_ni_fixed_mode_ignores_rate():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        national_insurance_rate=0.08,
+        national_insurance_mode="fixed",
+        national_insurance_fixed=950.0,
+    )
+    assert r["national_insurance_amount"] == pytest.approx(950.0)
+
+
+def test_ni_fixed_included_in_total_to_save():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        national_insurance_mode="fixed",
+        national_insurance_fixed=1200.0,
+        social_savings_rate=0.0,
+    )
+    assert r["total_to_save"] == pytest.approx(
+        r["income_tax_amount"] + 1200.0 + r["social_savings_amount"] + r["pension_amount"]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Fixed social savings mode
+# ---------------------------------------------------------------------------
+
+
+def test_ss_percentage_mode_default():
+    r = calculate_income_split(10000, vat_included=False)
+    assert r["social_savings_amount"] == pytest.approx(500.0)
+
+
+def test_ss_fixed_mode_uses_fixed_amount():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        social_savings_mode="fixed",
+        social_savings_fixed=800.0,
+    )
+    assert r["social_savings_amount"] == pytest.approx(800.0)
+
+
+def test_ss_fixed_mode_ignores_rate():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        social_savings_rate=0.05,
+        social_savings_mode="fixed",
+        social_savings_fixed=600.0,
+    )
+    assert r["social_savings_amount"] == pytest.approx(600.0)
+
+
+def test_both_fixed_modes_together():
+    r = calculate_income_split(
+        10000,
+        vat_included=False,
+        income_tax_rate=0.20,
+        national_insurance_mode="fixed",
+        national_insurance_fixed=1200.0,
+        social_savings_mode="fixed",
+        social_savings_fixed=800.0,
+    )
+    assert r["national_insurance_amount"] == pytest.approx(1200.0)
+    assert r["social_savings_amount"] == pytest.approx(800.0)
+    assert r["total_to_save"] == pytest.approx(2000.0 + 1200.0 + 800.0)
+    assert r["available_amount"] == pytest.approx(10000.0 - r["total_to_save"])

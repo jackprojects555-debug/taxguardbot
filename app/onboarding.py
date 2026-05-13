@@ -26,6 +26,32 @@ def parse_rate(text: str) -> Optional[float]:
     return val
 
 
+_FIXED_KEYWORDS = ("monthly", "קבוע", "fixed", "חודשי")
+
+
+def parse_rate_or_fixed(text: str) -> Optional[tuple]:
+    """Returns (mode, rate, fixed_amount) or None if invalid.
+
+    Pure number → percentage mode. Number + fixed keyword → fixed mode.
+    """
+    s = text.strip()
+    lower = s.lower()
+    for kw in _FIXED_KEYWORDS:
+        if kw in lower:
+            num_str = lower.replace(kw, "").strip().replace(",", "").replace("₪", "")
+            try:
+                val = float(num_str)
+            except ValueError:
+                return None
+            if val < 0:
+                return None
+            return ("fixed", 0.0, val)
+    rate = parse_rate(s)
+    if rate is None:
+        return None
+    return ("percentage", rate, 0.0)
+
+
 def parse_business_type(text: str) -> Optional[str]:
     t = text.strip().lower()
     if t in ("מורשה", "עוסק מורשה", "1", "vat registered", "registered"):
@@ -96,23 +122,29 @@ def handle_onboarding(user: BotUser, text: str) -> Tuple[str, bool]:
         return format_message(f"onboarding_ask_national_insurance_{lang}"), False
 
     if step == STEP_NATIONAL_INSURANCE:
-        rate = parse_rate(text)
-        if rate is None:
-            return format_message(f"onboarding_invalid_rate_{lang}"), False
+        parsed = parse_rate_or_fixed(text)
+        if parsed is None:
+            return format_message(f"onboarding_invalid_rate_or_fixed_{lang}"), False
+        mode, rate, fixed = parsed
         update_user_profile(
             user.telegram_user_id,
             national_insurance_rate=rate,
+            national_insurance_mode=mode,
+            national_insurance_fixed=fixed,
             onboarding_step=STEP_SOCIAL_SAVINGS,
         )
         return format_message(f"onboarding_ask_social_savings_{lang}"), False
 
     if step == STEP_SOCIAL_SAVINGS:
-        rate = parse_rate(text)
-        if rate is None:
-            return format_message(f"onboarding_invalid_rate_{lang}"), False
+        parsed = parse_rate_or_fixed(text)
+        if parsed is None:
+            return format_message(f"onboarding_invalid_rate_or_fixed_{lang}"), False
+        mode, rate, fixed = parsed
         update_user_profile(
             user.telegram_user_id,
             social_savings_rate=rate,
+            social_savings_mode=mode,
+            social_savings_fixed=fixed,
             onboarding_step=STEP_PENSION,
         )
         return format_message(f"onboarding_ask_pension_{lang}"), False

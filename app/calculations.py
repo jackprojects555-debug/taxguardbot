@@ -6,7 +6,11 @@ def calculate_income_split(
     vat_included: bool = True,
     income_tax_rate: float = 0.20,
     national_insurance_rate: float = 0.08,
+    national_insurance_mode: str = "percentage",
+    national_insurance_fixed: float = 0.0,
     social_savings_rate: float = 0.05,
+    social_savings_mode: str = "percentage",
+    social_savings_fixed: float = 0.0,
     pension_rate: float = 0.0,
 ) -> dict:
     if amount <= 0:
@@ -20,8 +24,14 @@ def calculate_income_split(
         base_amount = amount
 
     income_tax_amount = base_amount * income_tax_rate
-    national_insurance_amount = base_amount * national_insurance_rate
-    social_savings_amount = base_amount * social_savings_rate
+    if national_insurance_mode == "fixed":
+        national_insurance_amount = national_insurance_fixed
+    else:
+        national_insurance_amount = base_amount * national_insurance_rate
+    if social_savings_mode == "fixed":
+        social_savings_amount = social_savings_fixed
+    else:
+        social_savings_amount = base_amount * social_savings_rate
     pension_amount = base_amount * pension_rate
 
     total_to_save = (
