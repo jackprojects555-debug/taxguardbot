@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
     national_insurance_fixed DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     social_savings_mode TEXT NOT NULL DEFAULT 'percentage',
     social_savings_fixed DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    vat_period TEXT NOT NULL DEFAULT 'monthly',
     preferred_language TEXT NOT NULL DEFAULT 'he',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -116,6 +117,7 @@ _MIGRATIONS = [
     "ALTER TABLE users ADD COLUMN national_insurance_fixed DOUBLE PRECISION NOT NULL DEFAULT 0.0",
     "ALTER TABLE users ADD COLUMN social_savings_mode TEXT NOT NULL DEFAULT 'percentage'",
     "ALTER TABLE users ADD COLUMN social_savings_fixed DOUBLE PRECISION NOT NULL DEFAULT 0.0",
+    "ALTER TABLE users ADD COLUMN vat_period TEXT NOT NULL DEFAULT 'monthly'",
 ]
 
 

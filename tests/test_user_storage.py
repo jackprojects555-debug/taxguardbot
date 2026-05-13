@@ -62,6 +62,11 @@ def test_new_user_default_preferred_language():
     assert u.preferred_language == "he"
 
 
+def test_new_user_default_vat_period():
+    u = BotUser(telegram_user_id=1)
+    assert u.vat_period == "monthly"
+
+
 # ---------------------------------------------------------------------------
 # upsert_from_telegram
 # ---------------------------------------------------------------------------
@@ -145,6 +150,28 @@ def test_update_preferred_language():
     upsert_from_telegram(telegram_user_id=1)
     update_user_profile(1, preferred_language="en")
     assert get_user(1).preferred_language == "en"
+
+
+def test_update_vat_period_to_bi_monthly():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, vat_period="bi_monthly")
+    assert get_user(1).vat_period == "bi_monthly"
+
+
+def test_update_vat_period_back_to_monthly():
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, vat_period="bi_monthly")
+    update_user_profile(1, vat_period="monthly")
+    assert get_user(1).vat_period == "monthly"
+
+
+def test_vat_period_in_user_summary_dict():
+    from app.user_storage import user_summary_dict
+
+    upsert_from_telegram(telegram_user_id=1)
+    update_user_profile(1, vat_period="bi_monthly")
+    summary = user_summary_dict(get_user(1))
+    assert summary["vat_period"] == "bi_monthly"
 
 
 def test_preferred_language_persists_across_upsert():

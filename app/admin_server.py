@@ -108,6 +108,9 @@ async def admin_list_users() -> dict:
     return {"users": [_user_row(uid) for uid in all_ids]}
 
 
+_VAT_PERIODS = ("monthly", "bi_monthly")
+
+
 class UserCreateBody(BaseModel):
     telegram_user_id: int = Field(..., ge=1)
     username: Optional[str] = None
@@ -115,6 +118,7 @@ class UserCreateBody(BaseModel):
     notes: str = ""
     is_blocked: bool = False
     business_type: str = "vat_registered"
+    vat_period: str = "monthly"
     vat_included_default: bool = True
     income_tax_rate: float = Field(0.20, ge=0.0, le=1.0)
     national_insurance_rate: float = Field(0.08, ge=0.0, le=1.0)
@@ -129,6 +133,13 @@ class UserCreateBody(BaseModel):
             raise ValueError("business_type must be 'vat_registered' or 'vat_exempt'")
         return v
 
+    @field_validator("vat_period")
+    @classmethod
+    def validate_vat_period(cls, v: str) -> str:
+        if v not in _VAT_PERIODS:
+            raise ValueError(f"vat_period must be one of: {', '.join(_VAT_PERIODS)}")
+        return v
+
 
 class UserUpdateBody(BaseModel):
     username: Optional[str] = None
@@ -136,6 +147,7 @@ class UserUpdateBody(BaseModel):
     notes: Optional[str] = None
     is_blocked: Optional[bool] = None
     business_type: Optional[str] = None
+    vat_period: Optional[str] = None
     vat_included_default: Optional[bool] = None
     income_tax_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
     national_insurance_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
@@ -148,6 +160,13 @@ class UserUpdateBody(BaseModel):
     def validate_business_type(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and v not in ("vat_registered", "vat_exempt"):
             raise ValueError("business_type must be 'vat_registered' or 'vat_exempt'")
+        return v
+
+    @field_validator("vat_period")
+    @classmethod
+    def validate_vat_period(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and v not in _VAT_PERIODS:
+            raise ValueError(f"vat_period must be one of: {', '.join(_VAT_PERIODS)}")
         return v
 
 
@@ -163,6 +182,7 @@ async def admin_create_or_replace_user(body: UserCreateBody) -> dict:
     update_user_profile(
         body.telegram_user_id,
         business_type=body.business_type,
+        vat_period=body.vat_period,
         vat_included_default=body.vat_included_default,
         income_tax_rate=body.income_tax_rate,
         national_insurance_rate=body.national_insurance_rate,
@@ -188,6 +208,7 @@ async def admin_patch_user(telegram_user_id: int, body: UserUpdateBody) -> dict:
         k: v
         for k, v in {
             "business_type": body.business_type,
+            "vat_period": body.vat_period,
             "vat_included_default": body.vat_included_default,
             "income_tax_rate": body.income_tax_rate,
             "national_insurance_rate": body.national_insurance_rate,

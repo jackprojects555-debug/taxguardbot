@@ -16,6 +16,7 @@ class BotUser:
     onboarding_step: Optional[str] = None
     profile_notified: bool = False
     business_type: str = "vat_registered"
+    vat_period: str = "monthly"
     vat_included_default: bool = True
     income_tax_rate: float = 0.20
     national_insurance_rate: float = 0.08
@@ -48,6 +49,7 @@ def _row_to_user(row) -> BotUser:
         onboarding_step=row["onboarding_step"],
         profile_notified=bool(row["profile_notified"]),
         business_type=row["business_type"],
+        vat_period=row["vat_period"] or "monthly",
         vat_included_default=bool(row["vat_included_default"]),
         income_tax_rate=row["income_tax_rate"],
         national_insurance_rate=row["national_insurance_rate"],
@@ -91,6 +93,7 @@ def upsert_from_telegram(
 def update_user_profile(telegram_user_id: int, **kwargs) -> Optional[BotUser]:
     allowed = {
         "business_type",
+        "vat_period",
         "vat_included_default",
         "income_tax_rate",
         "national_insurance_rate",
@@ -157,6 +160,12 @@ def create_or_update_admin(
     is_blocked: Optional[bool] = None,
 ) -> BotUser:
     now = datetime.now().isoformat()
+    # is_blocked is NOT NULL in the schema. When not specified, preserve the existing value
+    # (or 0 for a new user) so the INSERT doesn't violate the NOT NULL constraint.
+    existing = get_user(telegram_user_id)
+    _is_blocked = (
+        int(is_blocked) if is_blocked is not None else (int(existing.is_blocked) if existing else 0)
+    )
     with get_connection() as conn:
         conn.execute(
             """
@@ -175,7 +184,7 @@ def create_or_update_admin(
                 username,
                 display_name,
                 notes or "",
-                int(is_blocked) if is_blocked is not None else None,
+                _is_blocked,
                 now,
                 now,
             ),
@@ -200,6 +209,7 @@ def user_summary_dict(user: BotUser) -> dict:
         "onboarding_step": user.onboarding_step,
         "profile_notified": user.profile_notified,
         "business_type": user.business_type,
+        "vat_period": user.vat_period,
         "vat_included_default": user.vat_included_default,
         "income_tax_rate": user.income_tax_rate,
         "national_insurance_rate": user.national_insurance_rate,

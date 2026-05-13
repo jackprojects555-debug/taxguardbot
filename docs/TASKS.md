@@ -12,6 +12,11 @@ _(none)_
 
 ## Done
 
+### [V2-009] VAT period flag
+Status: Complete
+Merged: feature/v2-009-vat-period → main (PR #22)
+Note: Also fixed pre-existing NOT NULL bug in create_or_update_admin when is_blocked not specified.
+
 ### [V2-008] Admin: CMS text editor endpoints
 Status: Complete
 Merged: feature/v2-008-cms-admin-endpoints → main (PR #21)
